@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Server, TransactionBuilder, Networks, Asset, Operation, BASE_FEE } from "@stellar/stellar-sdk";
+import { Horizon, TransactionBuilder, Networks, Asset, Operation, BASE_FEE } from "@stellar/stellar-sdk";
 
 export function WalletConnect() {
   const [pubKey, setPubKey] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export function WalletConnect() {
   const [amount, setAmount] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const server = new Server("https://horizon-testnet.stellar.org");
+  const server = new Horizon.Server("https://horizon-testnet.stellar.org");
 
   useEffect(() => {
     checkConnection();
