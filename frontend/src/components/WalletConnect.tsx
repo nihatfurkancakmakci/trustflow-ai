@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { isAllowed, setAllowed, getUserInfo, signTransaction } from "@stellar/freighter-api";
+import { isAllowed, setAllowed, getUserInfo, signTransaction, isConnected } from "@stellar/freighter-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -51,15 +51,24 @@ export function WalletConnect() {
   const connectWallet = async () => {
     setIsLoading(true);
     try {
+      const connected = await isConnected();
+      if (!connected) {
+        toast.error("Freighter wallet is not installed! Please install the Freighter browser extension.");
+        setIsLoading(false);
+        return;
+      }
       await setAllowed();
       const userInfo = await getUserInfo();
       if (userInfo.publicKey) {
         setPubKey(userInfo.publicKey);
         fetchBalance(userInfo.publicKey);
         toast.success("Wallet connected successfully!");
+      } else {
+        toast.error("Could not get public key. Please unlock your Freighter wallet.");
       }
     } catch (e) {
-      toast.error("Failed to connect wallet");
+      console.error("Wallet connection error:", e);
+      toast.error("Failed to connect wallet.");
     } finally {
       setIsLoading(false);
     }
