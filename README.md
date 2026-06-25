@@ -33,7 +33,8 @@ To run this project locally:
 
 ## Screenshots
 
-*(Note: Replace these placeholder images with actual screenshots before submitting)*
+### Initial View
+![Start Screen](./frontend/public/screenshots/start.png)
 
 ### Wallet Connected & Balance Displayed
 ![Wallet Connected](./frontend/public/screenshots/wallet-connected.png)
