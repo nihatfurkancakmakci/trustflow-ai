@@ -97,10 +97,14 @@ export function WalletConnect() {
         throw new Error((signedTx as any).error);
       }
       
-      const rawSignedTx = typeof signedTx === 'object' ? ((signedTx as any).signedTransaction || (signedTx as any).tx || (signedTx as any).signedTx) : signedTx;
+      const rawSignedTx = typeof signedTx === 'string' ? signedTx : typeof signedTx === 'object' ? ((signedTx as any).signedTransaction || (signedTx as any).tx || (signedTx as any).signedTx) : null;
 
       if (!rawSignedTx) {
-        throw new Error("No signed transaction returned from wallet");
+        const errorMsg = "Freighter response: " + JSON.stringify(signedTx);
+        console.error(errorMsg);
+        toast.error(errorMsg);
+        setIsLoading(false);
+        return;
       }
 
       const txBuilder = TransactionBuilder.fromXDR(rawSignedTx as string, Networks.TESTNET);
