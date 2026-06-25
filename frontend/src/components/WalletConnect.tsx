@@ -19,25 +19,6 @@ export function WalletConnect() {
 
   const server = new Horizon.Server("https://horizon-testnet.stellar.org");
 
-  useEffect(() => {
-    checkConnection();
-  }, []);
-
-  const checkConnection = async () => {
-    try {
-      if (await isAllowed()) {
-        const addressData = await getAddress();
-        const userAddress = typeof addressData === 'string' ? addressData : (addressData as any)?.address || (addressData as any)?.publicKey;
-        if (userAddress && !userAddress.error) {
-          setPubKey(userAddress);
-          fetchBalance(userAddress);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const fetchBalance = async (publicKey: string) => {
     try {
       const account = await server.loadAccount(publicKey);
