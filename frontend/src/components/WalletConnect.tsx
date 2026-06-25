@@ -93,11 +93,7 @@ export function WalletConnect() {
         network: "TESTNET"
       });
 
-      if ((signedTx as any)?.error) {
-        throw new Error((signedTx as any).error);
-      }
-      
-      const rawSignedTx = typeof signedTx === 'string' ? signedTx : typeof signedTx === 'object' ? ((signedTx as any).signedTransaction || (signedTx as any).tx || (signedTx as any).signedTx) : null;
+      const rawSignedTx = typeof signedTx === 'string' ? signedTx : typeof signedTx === 'object' ? ((signedTx as any).signedTxXdr || (signedTx as any).signedTransaction || (signedTx as any).tx || (signedTx as any).signedTx) : null;
 
       if (!rawSignedTx) {
         const errorMsg = "Freighter response: " + JSON.stringify(signedTx);
