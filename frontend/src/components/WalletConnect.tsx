@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { isAllowed, setAllowed, getUserInfo, signTransaction, isConnected } from "@stellar/freighter-api";
+import { isAllowed, setAllowed, getAddress, signTransaction, isConnected, requestAccess } from "@stellar/freighter-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,12 +24,17 @@ export function WalletConnect() {
   }, []);
 
   const checkConnection = async () => {
-    if (await isAllowed()) {
-      const userInfo = await getUserInfo();
-      if (userInfo.publicKey) {
-        setPubKey(userInfo.publicKey);
-        fetchBalance(userInfo.publicKey);
+    try {
+      if (await isAllowed()) {
+        const addressData = await getAddress();
+        const userAddress = typeof addressData === 'string' ? addressData : (addressData as any)?.address || (addressData as any)?.publicKey;
+        if (userAddress && !userAddress.error) {
+          setPubKey(userAddress);
+          fetchBalance(userAddress);
+        }
       }
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -57,11 +62,14 @@ export function WalletConnect() {
         setIsLoading(false);
         return;
       }
-      await setAllowed();
-      const userInfo = await getUserInfo();
-      if (userInfo.publicKey) {
-        setPubKey(userInfo.publicKey);
-        fetchBalance(userInfo.publicKey);
+      
+      await requestAccess(); // Ask for connection permission
+      const addressData = await getAddress();
+      const userAddress = typeof addressData === 'string' ? addressData : (addressData as any)?.address || (addressData as any)?.publicKey;
+      
+      if (userAddress && typeof userAddress === 'string' && userAddress.startsWith("G")) {
+        setPubKey(userAddress);
+        fetchBalance(userAddress);
         toast.success("Wallet connected successfully!");
       } else {
         toast.error("Could not get public key. Please unlock your Freighter wallet.");
