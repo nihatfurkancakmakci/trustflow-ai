@@ -93,8 +93,18 @@ export function WalletConnect() {
         network: "TESTNET"
       });
 
-      const txBuilder = TransactionBuilder.fromXDR(signedTx, Networks.TESTNET);
-      const result = await server.submitTransaction(txBuilder);
+      if ((signedTx as any)?.error) {
+        throw new Error((signedTx as any).error);
+      }
+      
+      const rawSignedTx = typeof signedTx === 'object' ? ((signedTx as any).signedTransaction || (signedTx as any).tx || (signedTx as any).signedTx) : signedTx;
+
+      if (!rawSignedTx) {
+        throw new Error("No signed transaction returned from wallet");
+      }
+
+      const txBuilder = TransactionBuilder.fromXDR(rawSignedTx as string, Networks.TESTNET);
+      const result = await server.submitTransaction(txBuilder as any);
       
       setTxHash(result.hash);
       toast.success("Transaction successful!");
