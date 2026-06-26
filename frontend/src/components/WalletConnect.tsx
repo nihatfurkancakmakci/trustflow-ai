@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { isAllowed, setAllowed, getAddress, signTransaction, isConnected, requestAccess } from "@stellar/freighter-api";
+import { useState } from "react";
+import { isConnected, getAddress, signTransaction, requestAccess } from "@stellar/freighter-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Horizon, TransactionBuilder, Networks, Asset, Operation, BASE_FEE } from "@stellar/stellar-sdk";
+import { motion } from "framer-motion";
+import { Wallet, Send, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 
 export function WalletConnect() {
   const [pubKey, setPubKey] = useState<string | null>(null);
@@ -39,12 +41,12 @@ export function WalletConnect() {
     try {
       const connected = await isConnected();
       if (!connected) {
-        toast.error("Freighter wallet is not installed! Please install the Freighter browser extension.");
+        toast.error("Freighter wallet is not installed!");
         setIsLoading(false);
         return;
       }
       
-      await requestAccess(); // Ask for connection permission
+      await requestAccess();
       const addressData = await getAddress();
       const userAddress = typeof addressData === 'string' ? addressData : (addressData as any)?.address || (addressData as any)?.publicKey;
       
@@ -53,7 +55,7 @@ export function WalletConnect() {
         fetchBalance(userAddress);
         toast.success("Wallet connected successfully!");
       } else {
-        toast.error("Could not get public key. Please unlock your Freighter wallet.");
+        toast.error("Could not get public key.");
       }
     } catch (e) {
       console.error("Wallet connection error:", e);
@@ -96,9 +98,7 @@ export function WalletConnect() {
       const rawSignedTx = typeof signedTx === 'string' ? signedTx : typeof signedTx === 'object' ? ((signedTx as any).signedTxXdr || (signedTx as any).signedTransaction || (signedTx as any).tx || (signedTx as any).signedTx) : null;
 
       if (!rawSignedTx) {
-        const errorMsg = "Freighter response: " + JSON.stringify(signedTx);
-        console.error(errorMsg);
-        toast.error(errorMsg);
+        toast.error("Transaction signature failed.");
         setIsLoading(false);
         return;
       }
@@ -108,97 +108,140 @@ export function WalletConnect() {
       
       setTxHash(result.hash);
       toast.success("Transaction successful!");
-      fetchBalance(pubKey); // Refresh balance
+      fetchBalance(pubKey);
       setReceiverAddress("");
       setAmount("");
     } catch (error) {
       console.error(error);
-      toast.error("Transaction failed. Check console for details.");
+      toast.error("Transaction failed.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-6 w-full max-w-md mx-auto">
-      <Card className="w-full border-zinc-200 dark:border-zinc-800 shadow-xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">TrustFlow AI</CardTitle>
-          <CardDescription>Level 1 - White Belt Submission</CardDescription>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="flex flex-col items-center justify-center space-y-6 w-full max-w-md mx-auto relative z-10"
+    >
+      <Card className="w-full border-white/10 shadow-2xl bg-black/40 backdrop-blur-2xl text-white overflow-hidden">
+        {/* Top green accent line */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-400 to-green-600"></div>
+        
+        <CardHeader className="pb-4">
+          <CardTitle className="text-3xl font-extrabold flex items-center gap-2">
+            <Zap className="w-8 h-8 text-green-500" />
+            <span>TrustFlow <span className="text-green-500">AI</span></span>
+          </CardTitle>
+          <CardDescription className="text-zinc-400">Secure. Fast. Decentralized.</CardDescription>
         </CardHeader>
+
         <CardContent>
           {!pubKey ? (
-            <div className="flex justify-center py-8">
-              <Button onClick={connectWallet} disabled={isLoading} size="lg" className="w-full bg-indigo-600 hover:bg-indigo-700">
-                {isLoading ? "Connecting..." : "Connect Freighter Wallet"}
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex justify-center py-8"
+            >
+              <Button 
+                onClick={connectWallet} 
+                disabled={isLoading} 
+                size="lg" 
+                className="w-full h-12 bg-green-500 hover:bg-green-600 text-black font-bold text-lg rounded-xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] betterhover:active:scale-[0.98]"
+              >
+                <Wallet className="w-5 h-5 mr-2" />
+                {isLoading ? "Connecting..." : "Connect Wallet"}
               </Button>
-            </div>
+            </motion.div>
           ) : (
-            <div className="space-y-6">
-              <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 space-y-2">
-                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase tracking-wider">Connected Account</p>
-                <p className="text-sm font-medium break-all text-zinc-700 dark:text-zinc-300">{pubKey}</p>
-                <div className="pt-2">
-                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase tracking-wider">Testnet Balance</p>
-                  <p className="text-3xl font-black text-indigo-900 dark:text-indigo-100">{balance ? `${balance} XLM` : "Fetching..."}</p>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6"
+            >
+              {/* Wallet Info Box */}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10">
+                  <p className="text-xs text-green-500 font-semibold uppercase tracking-wider flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> Connected Account
+                  </p>
+                  <p className="text-sm font-mono break-all text-zinc-300 mt-1">{pubKey}</p>
+                </div>
+                <div className="relative z-10 pt-3 border-t border-white/10">
+                  <p className="text-xs text-green-500 font-semibold uppercase tracking-wider">Testnet Balance</p>
+                  <p className="text-4xl font-black text-white mt-1">
+                    {balance ? `${balance} XLM` : "Fetching..."}
+                  </p>
                 </div>
               </div>
-              <Button variant="outline" onClick={disconnectWallet} className="w-full">
-                Disconnect Wallet
+              
+              <Button variant="outline" onClick={disconnectWallet} className="w-full border-white/10 text-zinc-300 hover:bg-white/5 hover:text-white rounded-xl h-10">
+                Disconnect
               </Button>
               
-              <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
-                <h3 className="font-semibold text-lg">Send Test Transaction</h3>
+              <div className="pt-6 border-t border-white/10 space-y-5">
+                <h3 className="font-semibold text-lg text-white">Send Transaction</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="address">Destination Address</Label>
+                  <Label htmlFor="address" className="text-zinc-400">Destination Address</Label>
                   <Input 
                     id="address" 
                     placeholder="G..." 
                     value={receiverAddress}
                     onChange={(e) => setReceiverAddress(e.target.value)}
-                    className="font-mono text-sm"
+                    className="font-mono text-sm bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus-visible:ring-green-500 rounded-xl h-11"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount (XLM)</Label>
+                  <Label htmlFor="amount" className="text-zinc-400">Amount (XLM)</Label>
                   <Input 
                     id="amount" 
                     type="number"
-                    placeholder="1.5" 
+                    placeholder="0.0" 
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
+                    className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus-visible:ring-green-500 rounded-xl h-11"
                   />
                 </div>
+                
                 <Button 
                   onClick={sendTransaction} 
                   disabled={isLoading || !receiverAddress || !amount}
-                  className="w-full bg-zinc-900 hover:bg-zinc-800 text-white"
+                  className="w-full h-12 bg-green-500 hover:bg-green-600 text-black font-bold text-lg rounded-xl transition-all shadow-[0_0_15px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] disabled:opacity-50 betterhover:active:scale-[0.98]"
                 >
-                  {isLoading ? "Processing..." : "Send XLM"}
+                  <Send className="w-5 h-5 mr-2" />
+                  {isLoading ? "Processing..." : "Confirm & Send"}
                 </Button>
 
                 {txHash && (
-                  <div className="p-4 mt-4 text-sm rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900 break-all">
-                    <p className="font-bold flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    className="p-4 mt-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 break-all"
+                  >
+                    <p className="font-bold flex items-center gap-2 text-green-500">
+                      <ShieldCheck className="w-5 h-5" />
                       Transaction Success!
                     </p>
-                    <p className="mt-2 text-xs opacity-80">Hash: {txHash}</p>
+                    <p className="mt-2 text-xs font-mono opacity-80 text-zinc-300">Hash: {txHash}</p>
                     <a 
                       href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-2 inline-block font-semibold underline hover:no-underline"
+                      className="mt-3 flex items-center gap-1 text-sm font-semibold text-green-400 hover:text-green-300 transition-colors"
                     >
-                      View on Stellar Expert →
+                      View on Explorer <ExternalLink className="w-3 h-3" />
                     </a>
-                  </div>
+                  </motion.div>
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

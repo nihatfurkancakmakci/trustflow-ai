@@ -1,13 +1,21 @@
-# TrustFlow AI (Level 1 - White Belt)
+# TrustFlow AI
 
-TrustFlow AI is an AI-powered Project Operating System designed for freelancers and clients. This repository contains the Level 1 submission for the Stellar Journey to Mastery program.
+[![Stellar Testnet](https://img.shields.io/badge/Stellar-Testnet-blue?style=for-the-badge&logo=stellar)](https://stellar.org)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
+
+TrustFlow AI is an AI-powered Project Operating System designed for freelancers and clients. This repository contains the submission for the Stellar Journey to Mastery program, starting from Level 1 (White Belt) and transitioning to Level 2 with a fully overhauled, premium Web3 UI.
 
 ## Project Overview
 
-In this Level 1 (White Belt) submission, we implemented the core foundations of the TrustFlow AI frontend:
-- **Wallet Connection**: Integrated `@stellar/freighter-api` to allow users to connect and disconnect their Freighter wallets.
-- **Balance Fetching**: Uses the Stellar Horizon Testnet API to fetch and display the user's native XLM balance in real-time.
-- **Transactions**: Built a UI that allows users to send XLM on the Stellar Testnet. It provides immediate feedback upon success and displays the transaction hash linking to Stellar Expert.
+Our platform demonstrates seamless interaction with the Stellar Network, wrapped in a **Premium Dark Mode** and **Glassmorphism** UI to provide an exceptional user experience:
+
+- **Stunning UI/UX**: Rebuilt with framer-motion animations, deep space black backgrounds, and neon emerald/green accents for a true Web3 feel.
+- **Wallet Connection**: Secure integration with `@stellar/freighter-api` to authenticate and authorize users.
+- **Real-Time Data**: Live fetching of native XLM balances directly from the Stellar Horizon Testnet.
+- **Transactions**: Effortless peer-to-peer XLM transfers on the testnet with instant transaction hash generation and links to Stellar Expert.
 
 ## Setup Instructions
 
@@ -33,11 +41,13 @@ To run this project locally:
 
 ## Screenshots
 
-### Initial View
+*(Note: The UI has just been completely overhauled with a Premium Dark Mode, Glassmorphism, and neon green accents. Please take new screenshots and place them here.)*
+
+### 1. Premium Dark Theme & Glassmorphism Connect Screen
 ![Start Screen](./frontend/public/screenshots/start.png)
 
-### Wallet Connected & Balance Displayed
+### 2. Connected Wallet & Balance Dashboard
 ![Wallet Connected](./frontend/public/screenshots/wallet-connected.png)
 
-### Successful Testnet Transaction
+### 3. Smooth Transaction Process
 ![Transaction Success](./frontend/public/screenshots/tx-success.png)
