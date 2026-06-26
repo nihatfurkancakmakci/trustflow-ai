@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <h1>🌟 TrustFlow AI</h1>
+  <p><strong>Secure. Fast. Decentralized. The Next-Gen Freelance & Project Operating System powered by Stellar.</strong></p>
 
-## Getting Started
+  <div>
+    <img src="https://img.shields.io/badge/Stellar-Testnet-blue?style=for-the-badge&logo=stellar" alt="Stellar" />
+    <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer" alt="Framer Motion" />
+  </div>
+</div>
 
-First, run the development server:
+<br />
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+> **🏆 Submission for the Stellar Journey to Mastery Program**
+> This repository represents the evolution of TrustFlow AI, from a Level 1 (White Belt) foundation to a fully overhauled, premium Web3 ecosystem ready for Level 2 (Soroban Smart Contracts).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌌 The Vision
+TrustFlow AI bridges the gap between freelancers, clients, and decentralized finance. By leveraging the unmatched speed and low fees of the **Stellar Network**, we provide a trustless, automated, and frictionless payment infrastructure wrapped in a world-class UI.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Key Features (Level 1 Mastery)
+- 🎨 **Premium UI/UX**: An immersive "Deep Space" dark mode featuring glassmorphism, fluid `framer-motion` animations, and neon emerald accents.
+- 🔐 **Seamless Wallet Integration**: One-click connect via the `@stellar/freighter-api`. 
+- 📊 **Real-Time Testnet Data**: Live fetching of XLM balances directly from the Stellar Horizon nodes.
+- ⚡ **Frictionless Transactions**: Peer-to-peer XLM transfers tested and verified, complete with instant transaction hashing and Stellar Expert explorer links.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📸 Visual Showcase & User Journey
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+We believe Web3 shouldn't be clunky. Here is the seamless user experience we've crafted:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+<details open>
+<summary><b>1. The Immersive Connect Screen</b></summary>
+<br/>
+<p align="center">
+  <img src="./public/screenshots/start.png" width="800" alt="Start Screen" />
+</p>
+</details>
 
-## Deploy on Vercel
+<details open>
+<summary><b>2. Connected Dashboard & Live Balance</b></summary>
+<br/>
+<p align="center">
+  <img src="./public/screenshots/wallet-connected.png" width="800" alt="Wallet Connected" />
+</p>
+</details>
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+<details open>
+<summary><b>3. Secure Freighter Approval</b></summary>
+<br/>
+<p align="center">
+  <img src="./public/screenshots/trustflow-ui.png" width="800" alt="Wallet Approval" />
+</p>
+</details>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<details open>
+<summary><b>4. Instant Transaction Verification</b></summary>
+<br/>
+<p align="center">
+  <img src="./public/screenshots/tx-success.png" width="800" alt="Transaction Success" />
+</p>
+</details>
+
+---
+
+## 🚀 Getting Started
+
+Experience the premium UI and Stellar integration locally in just a few steps:
+
+### Prerequisites
+- Node.js (v18+)
+- [Freighter Wallet](https://freighter.app/) extension (Set to **Testnet**)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/nihatfurkancakmakci/trustflow-ai.git
+   cd trustflow-ai/frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Ignite the server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Explore**
+   Open [http://localhost:3000](http://localhost:3000) and step into the future of decentralized work.
+
+---
+
+## 🗺️ Roadmap: What's Next? (Level 2 & Beyond)
+With the Level 1 integration and UI overhaul fully completed, we are now architecting **Soroban Smart Contracts** to handle:
+- Escrow systems for milestone-based payments.
+- Trustless dispute resolution.
+- Tokenized reputation scores for freelancers.
+
+<br />
+
+<div align="center">
+  <p>Built with 💚 for the Stellar Ecosystem.</p>
+</div>
