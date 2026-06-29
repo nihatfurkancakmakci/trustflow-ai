@@ -167,12 +167,7 @@ export default function ProfilePage() {
             Back to Dashboard
           </Button>
           
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} className="bg-white text-black hover:bg-zinc-200 rounded-xl font-bold px-6 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-              <Edit2 className="w-4 h-4 mr-2" />
-              Edit Profile
-            </Button>
-          ) : (
+          {isEditing && (
             <div className="flex gap-3">
               <Button variant="ghost" onClick={() => setIsEditing(false)} className="text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-xl" disabled={isSubmitting}>
                 <X className="w-4 h-4 mr-2" />
@@ -231,9 +226,20 @@ export default function ProfilePage() {
                 </div>
                 
                 <div className="pt-6 space-y-4">
-                  <div className="flex items-center gap-3 text-sm text-zinc-400">
-                    <Mail className="w-4 h-4 text-zinc-500" />
-                    <span className="truncate">{userProfile.email}</span>
+                  <div className="flex items-center justify-between gap-3 text-sm text-zinc-400">
+                    <div className="flex items-center gap-3 truncate">
+                      <Mail className="w-4 h-4 text-zinc-500" />
+                      <span className="truncate">{userProfile.email}</span>
+                    </div>
+                    {!isEditing && (
+                      <button 
+                        onClick={() => setIsEditing(true)} 
+                        className="text-xs text-blue-400 hover:text-blue-350 hover:underline font-bold shrink-0 flex items-center gap-1 focus:outline-none"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        Edit
+                      </button>
+                    )}
                   </div>
                   {userProfile.phone && (
                     <div className="flex items-center gap-3 text-sm text-zinc-400">
@@ -262,13 +268,6 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            
-            <Button variant="outline" className="w-full border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-xl h-12" onClick={() => {
-              disconnect();
-              router.push('/');
-            }}>
-              Log Out Securely
-            </Button>
           </div>
 
           {/* Right Content Area */}
@@ -390,11 +389,6 @@ export default function ProfilePage() {
                             <span className="text-yellow-400">⭐</span>
                             Work History & Reviews
                           </h3>
-                          {totalReviews === 0 && (
-                            <Button variant="outline" size="sm" onClick={seedData} className="border-green-500/30 text-green-400 hover:bg-green-500/10">
-                              Create Sample Data
-                            </Button>
-                          )}
                         </div>
 
                         {isLoadingReviews ? (

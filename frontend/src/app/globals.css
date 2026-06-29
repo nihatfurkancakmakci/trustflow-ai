@@ -159,3 +159,16 @@ input[type="number"] {
 ::-webkit-scrollbar-thumb:hover {
   background: #2ce610; /* slightly darker for hover */
 }
+
+/* Hide scrollbar for mobile/tablet screens */
+@media (max-width: 1023px) {
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  * {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE/Edge */
+  }
+}

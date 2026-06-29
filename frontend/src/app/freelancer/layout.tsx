@@ -107,7 +107,7 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-            className="lg:hidden fixed inset-y-0 left-0 w-72 bg-zinc-950 border-r border-white/10 z-50 flex flex-col pt-16 shadow-2xl"
+            className="lg:hidden fixed inset-y-0 left-0 w-64 bg-zinc-950 border-r border-white/10 z-50 flex flex-col pt-16 shadow-2xl"
           >
             <Suspense fallback={<nav className="flex-1 p-4 space-y-2"></nav>}>
               <div onClick={() => setIsMobileMenuOpen(false)} className="flex-1 flex flex-col overflow-y-auto">

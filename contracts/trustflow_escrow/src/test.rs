@@ -158,9 +158,9 @@ fn test_auto_approve_after_timeout() {
         sequence_number: 100,
         network_id: Default::default(),
         base_reserve: 10,
-        min_temp_entry_ttl: 100,
-        min_persistent_entry_ttl: 100,
-        max_entry_ttl: 10_000,
+        min_temp_entry_ttl: 10_000,
+        min_persistent_entry_ttl: 10_000,
+        max_entry_ttl: 100_000,
     });
     
     escrow_client.init_escrow(
@@ -175,12 +175,12 @@ fn test_auto_approve_after_timeout() {
     env.ledger().set(LedgerInfo {
         timestamp: 1_699_900_000 + AUTO_APPROVE_PERIOD + 1,
         protocol_version: 22,
-        sequence_number: 200,
+        sequence_number: 101, // Keep sequence increments small to prevent archiving key in tests
         network_id: Default::default(),
         base_reserve: 10,
-        min_temp_entry_ttl: 100,
-        min_persistent_entry_ttl: 100,
-        max_entry_ttl: 10_000,
+        min_temp_entry_ttl: 10_000,
+        min_persistent_entry_ttl: 10_000,
+        max_entry_ttl: 100_000,
     });
     
     // Auto approve should succeed now
@@ -208,9 +208,9 @@ fn test_cancel_and_refund_after_deadline() {
         sequence_number: 100,
         network_id: Default::default(),
         base_reserve: 10,
-        min_temp_entry_ttl: 100,
-        min_persistent_entry_ttl: 100,
-        max_entry_ttl: 10_000,
+        min_temp_entry_ttl: 10_000,
+        min_persistent_entry_ttl: 10_000,
+        max_entry_ttl: 100_000,
     });
     
     let client_balance_before = token::Client::new(&env, &token).balance(&client);
@@ -224,12 +224,12 @@ fn test_cancel_and_refund_after_deadline() {
     env.ledger().set(LedgerInfo {
         timestamp: deadline + GRACE_PERIOD + 1,
         protocol_version: 22,
-        sequence_number: 200,
+        sequence_number: 101, // Keep sequence increments small to prevent archiving key in tests
         network_id: Default::default(),
         base_reserve: 10,
-        min_temp_entry_ttl: 100,
-        min_persistent_entry_ttl: 100,
-        max_entry_ttl: 10_000,
+        min_temp_entry_ttl: 10_000,
+        min_persistent_entry_ttl: 10_000,
+        max_entry_ttl: 100_000,
     });
     
     // Client cancels and refunds
