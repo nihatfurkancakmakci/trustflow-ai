@@ -198,6 +198,80 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   const [aiReviews, setAiReviews] = useState<Record<string, any>>({});
   const [loadingAiReview, setLoadingAiReview] = useState<Record<string, boolean>>({});
 
+  // Review System States
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+  const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
+
+  // Local proposal cache cleanup for outdated test job
+  useEffect(() => {
+    const badJobId = "cmqyuqjd90002d5ucxi41kzmu";
+    const saved = localStorage.getItem("trustflow_proposals");
+    if (saved) {
+      try {
+        const proposals: ProposalData[] = JSON.parse(saved);
+        const filtered = proposals.filter(p => p.jobId !== badJobId);
+        if (filtered.length !== proposals.length) {
+          localStorage.setItem("trustflow_proposals", JSON.stringify(filtered));
+          setSubmittedProposals(filtered);
+          if (selectedWorkroom?.jobId === badJobId) {
+            setSelectedWorkroom(null);
+            setActiveTab("workrooms");
+          }
+        }
+      } catch (e) {}
+    }
+  }, [selectedWorkroom]);
+
+  // Check if completed workroom has a review already submitted
+  useEffect(() => {
+    if (selectedWorkroom && selectedWorkroom.status === "COMPLETED") {
+      fetch(`/api/users/${selectedWorkroom.freelancerAddress}/reviews`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.reviews) {
+            const alreadyReviewed = data.reviews.some((r: any) => r.jobId === selectedWorkroom.jobId);
+            setHasSubmittedReview(alreadyReviewed);
+          }
+        })
+        .catch(e => console.error("Error loading review status:", e));
+    }
+  }, [selectedWorkroom]);
+
+  const handleSendReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedWorkroom) return;
+    
+    setIsReviewSubmitting(true);
+    try {
+      const response = await fetch(`/api/users/${selectedWorkroom.freelancerAddress}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rating: reviewRating,
+          comment: reviewComment,
+          jobId: selectedWorkroom.jobId,
+          reviewerId: pubKey
+        })
+      });
+      
+      if (response.ok) {
+        toast.success("Review submitted successfully! Thank you for your feedback.");
+        setHasSubmittedReview(true);
+        setReviewComment("");
+      } else {
+        const err = await response.json();
+        toast.error(err.error || "Failed to submit review");
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsReviewSubmitting(false);
+    }
+  };
+
   // Fetch AI reviews dynamically when a workroom is selected and has submitted milestones
   useEffect(() => {
     if (selectedWorkroom) {
@@ -1674,9 +1748,55 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                   </div>
 
                   {selectedWorkroom.status === "COMPLETED" && (
-                     <div className="text-center py-6 text-green-400 font-bold bg-green-500/10 rounded-xl">
-                        Escrow Completed Successfully! 🎉
-                     </div>
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                      {role === "client" ? (
+                        hasSubmittedReview ? (
+                          <div className="text-center py-6 text-green-400 font-bold bg-green-500/10 rounded-2xl border border-green-500/20 space-y-1">
+                            <p className="text-base">Escrow Completed Successfully! 🎉</p>
+                            <p className="text-xs text-zinc-400 font-normal">Thank you for rating your freelancer. Your review is now public.</p>
+                          </div>
+                        ) : (
+                          <motion.form 
+                            onSubmit={handleSendReview} 
+                            className="bg-zinc-950/60 border border-green-500/20 p-5 rounded-2xl space-y-4 shadow-[0_0_15px_rgba(34,197,94,0.05)]"
+                          >
+                            <h4 className="text-white font-bold text-sm flex items-center gap-2">
+                              <Sparkles className="w-4 h-4 text-yellow-500" /> Rate the Freelancer
+                            </h4>
+                            <div className="flex gap-2 justify-center py-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  type="button"
+                                  key={star}
+                                  onClick={() => setReviewRating(star)}
+                                  className="text-2xl transition-transform hover:scale-110 active:scale-95 focus:outline-none"
+                                >
+                                  {star <= reviewRating ? "★" : "☆"}
+                                </button>
+                              ))}
+                            </div>
+                            <Textarea
+                              placeholder="Write a review about the freelancer's communication, speed, and code quality..."
+                              value={reviewComment}
+                              onChange={(e) => setReviewComment(e.target.value)}
+                              className="bg-black/50 border-white/10 text-white text-xs min-h-[70px]"
+                              required
+                            />
+                            <Button 
+                              type="submit" 
+                              disabled={isReviewSubmitting || !reviewComment.trim()} 
+                              className="w-full bg-green-500 hover:bg-green-600 text-black font-bold text-xs py-2.5 rounded-xl shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+                            >
+                              {isReviewSubmitting ? "Submitting..." : "Submit Review"}
+                            </Button>
+                          </motion.form>
+                        )
+                      ) : (
+                        <div className="text-center py-6 text-green-400 font-bold bg-green-500/10 rounded-2xl border border-green-500/20">
+                          Escrow Completed Successfully! Awaiting client feedback. 🎉
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {selectedWorkroom.status !== "COMPLETED" && (
