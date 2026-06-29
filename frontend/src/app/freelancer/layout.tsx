@@ -2,9 +2,10 @@
 
 import { useWallet } from "@/components/WalletProvider";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useState } from "react";
 import Link from "next/link";
-import { LayoutDashboard, Code, Zap, LogOut, FileText, Lock, Search } from "lucide-react";
+import { LayoutDashboard, Code, Zap, LogOut, FileText, Lock, Search, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function FreelancerSidebarNav() {
   const searchParams = useSearchParams();
@@ -32,6 +33,7 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
   const { userProfile, address, disconnect } = useWallet();
   const role = userProfile?.role;
   const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!address || role !== "freelancer") {
@@ -39,12 +41,38 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
     }
   }, [address, role, router]);
 
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (!address || role !== "freelancer") return null;
 
   return (
-    <div className="flex h-screen bg-black text-white">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 bg-zinc-950 flex flex-col">
+    <div className="flex flex-col lg:flex-row h-screen bg-black text-white overflow-hidden">
+      
+      {/* Mobile Header */}
+      <header className="lg:hidden flex justify-between items-center p-4 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-40">
+        <div className="flex items-center gap-2">
+          <Zap className="w-5 h-5 text-green-500" />
+          <span className="font-extrabold text-lg">TrustFlow <span className="text-green-500">FL</span></span>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-1.5 rounded-lg hover:bg-white/5 transition-colors focus:outline-none"
+        >
+          {isMobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+        </button>
+      </header>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-64 border-r border-white/10 bg-zinc-950 flex flex-col shrink-0">
         <div className="p-6 border-b border-white/10 flex items-center gap-2">
           <Zap className="w-6 h-6 text-green-500" />
           <span className="font-extrabold text-xl">TrustFlow <span className="text-green-500">FL</span></span>
@@ -71,8 +99,51 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      {/* Mobile Drawer Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+            className="lg:hidden fixed inset-y-0 left-0 w-72 bg-zinc-950 border-r border-white/10 z-50 flex flex-col pt-16 shadow-2xl"
+          >
+            <Suspense fallback={<nav className="flex-1 p-4 space-y-2"></nav>}>
+              <div onClick={() => setIsMobileMenuOpen(false)} className="flex-1 flex flex-col overflow-y-auto">
+                <FreelancerSidebarNav />
+              </div>
+            </Suspense>
+
+            <div className="p-4 border-t border-white/10 bg-zinc-950">
+              <button 
+                onClick={() => { disconnect(); router.push("/"); setIsMobileMenuOpen(false); }}
+                className="flex items-center gap-3 px-4 py-3 w-full hover:bg-red-500/10 rounded-xl text-zinc-400 hover:text-red-400 transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Disconnect
+              </button>
+              <button 
+                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                className="flex items-center gap-3 px-4 py-3 mt-2 w-full hover:bg-amber-500/10 rounded-xl text-zinc-500 hover:text-amber-500 transition-colors text-sm"
+              >
+                Reset Test Data
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Drawer Overlay Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+        />
+      )}
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto w-full">
         {children}
       </main>
     </div>
