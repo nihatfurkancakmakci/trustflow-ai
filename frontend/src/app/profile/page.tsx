@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, User, Briefcase, Mail, Phone, MapPin, Globe, Code, Calendar, Edit2, Check, X, Sparkles } from "lucide-react";
 
 export default function ProfilePage() {
-  const { address, userProfile, disconnect, fetchUserProfile } = useWallet();
+  const { address, userProfile, disconnect, fetchUserProfile, isInitializing } = useWallet();
   const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -40,6 +40,7 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
+    if (isInitializing) return;
     if (!address) {
       router.push("/");
     } else if (userProfile) {
@@ -120,7 +121,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (!userProfile) return <div className="min-h-screen bg-black flex items-center justify-center text-white"><div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div></div>;
+  if (isInitializing || !userProfile) return <div className="min-h-screen bg-black flex items-center justify-center text-white"><div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div></div>;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

@@ -30,16 +30,17 @@ function FreelancerSidebarNav() {
 }
 
 export default function FreelancerLayout({ children }: { children: React.ReactNode }) {
-  const { userProfile, address, disconnect } = useWallet();
+  const { userProfile, address, disconnect, isInitializing } = useWallet();
   const role = userProfile?.role;
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (isInitializing) return;
     if (!address || role !== "freelancer") {
       router.push("/");
     }
-  }, [address, role, router]);
+  }, [address, role, router, isInitializing]);
 
   // Close mobile menu when screen size changes to desktop
   useEffect(() => {
@@ -51,6 +52,10 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  if (isInitializing) {
+    return <div className="min-h-screen bg-black flex items-center justify-center text-white"><div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div></div>;
+  }
 
   if (!address || role !== "freelancer") return null;
 
