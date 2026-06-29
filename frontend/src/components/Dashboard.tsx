@@ -665,20 +665,20 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   // UI Render functionsStyle = "flex h-10 w-full rounded-md border border-input bg-black/50 px-3 py-2 text-sm text-white border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-8 pb-20 pt-10 min-h-[800px]">
+    <div className="w-full max-w-6xl mx-auto space-y-8 pb-20 pt-10 px-4 sm:px-6 lg:px-8 min-h-[800px]">
       
       {!isEmbedded && (
         <div className="flex justify-center mb-10">
-          <div className="bg-zinc-900/80 p-1.5 rounded-2xl flex border border-white/5 backdrop-blur-md">
+          <div className="bg-zinc-900/80 p-1 rounded-2xl flex flex-wrap sm:flex-nowrap border border-white/5 backdrop-blur-md">
             <button 
               onClick={() => { setRole("freelancer"); setActiveTab("board"); setSelectedJob(null); }}
-              className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${role === "freelancer" ? "bg-green-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.3)]" : "text-zinc-400 hover:text-white"}`}
+              className={`px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm sm:text-base ${role === "freelancer" ? "bg-green-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.3)]" : "text-zinc-400 hover:text-white"}`}
             >
               <UserCircle className="w-5 h-5" /> Freelancer Mode
             </button>
             <button 
               onClick={() => { setRole("client"); setActiveTab("active"); setSelectedJob(null); }}
-              className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${role === "client" ? "bg-blue-500 text-black shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-zinc-400 hover:text-white"}`}
+              className={`px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm sm:text-base ${role === "client" ? "bg-blue-500 text-black shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-zinc-400 hover:text-white"}`}
             >
               <Briefcase className="w-5 h-5" /> Client Mode
             </button>
@@ -699,12 +699,12 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
           >
             {/* If not embedded, show the top tab bar. */}
             {!isEmbedded && (
-              <div className="flex gap-4 border-b border-white/10 pb-4 mb-4">
-                <button onClick={() => {setActiveTab("board"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "board" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>Job Board</button>
-                <button onClick={() => {setActiveTab("active"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "active" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+              <div className="flex flex-wrap gap-2 sm:gap-4 border-b border-white/10 pb-4 mb-4">
+                <button onClick={() => {setActiveTab("board"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "board" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>Job Board</button>
+                <button onClick={() => {setActiveTab("active"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "active" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                   Pending Proposals <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => p.status.startsWith("PENDING")).length}</span>
                 </button>
-                <button onClick={() => {setActiveTab("workrooms"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "workrooms" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+                <button onClick={() => {setActiveTab("workrooms"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "workrooms" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                   Workrooms <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length}</span>
                 </button>
               </div>
@@ -984,16 +984,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
           >
             {/* If not embedded, show the top tab bar. If embedded, the Layout sidebar handles navigation, so we only show the "Post New Job" button. */}
             {!isEmbedded && (
-              <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <div className="flex gap-4">
-                  <button onClick={() => {setActiveTab("active"); setIsEditingJob(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "active" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>My Posted Jobs</button>
-                  <button onClick={() => {setActiveTab("proposals"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "proposals" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 border-b border-white/10 pb-4 mb-4">
+                <div className="flex flex-wrap gap-2 sm:gap-4">
+                  <button onClick={() => {setActiveTab("active"); setIsEditingJob(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "active" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>My Posted Jobs</button>
+                  <button onClick={() => {setActiveTab("proposals"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "proposals" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                     Pending Proposals <span className="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => p.status.startsWith("PENDING")).length}</span>
                   </button>
-                  <button onClick={() => {setActiveTab("workrooms"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "workrooms" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+                  <button onClick={() => {setActiveTab("workrooms"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "workrooms" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                     Active Escrows <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length}</span>
                   </button>
-                  <button onClick={() => {setActiveTab("discover"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all ${activeTab === "discover" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+                  <button onClick={() => {setActiveTab("discover"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "discover" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                     Discover Talent <span className="text-xs bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-2 py-0.5 rounded-full ml-1 font-bold animate-pulse">NEW</span>
                   </button>
                 </div>
