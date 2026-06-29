@@ -1,111 +1,50 @@
-<div align="center">
-  <h1>🌟 TrustFlow AI</h1>
-  <p><strong>Secure. Fast. Decentralized. The Next-Gen Freelance & Project Operating System powered by Stellar.</strong></p>
+﻿# TrustFlow AI - Level 2 (Yellow Belt) Submission
 
-  <div>
-    <img src="https://img.shields.io/badge/Stellar-Testnet-blue?style=for-the-badge&logo=stellar" alt="Stellar" />
-    <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-    <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer" alt="Framer Motion" />
-  </div>
-</div>
+Welcome to the TrustFlow AI Level 2 (Yellow Belt) submission for the **Stellar Journey to Mastery 2.0**. This branch focuses exclusively on **multi-wallet integration, smart contract deployment, error handling, and real-time event synchronization**.
 
-<br />
+## 🚀 Features (Level 2 Requirements Met)
+- **StellarWalletsKit Implementation**: Integrated @creit.tech/stellar-wallets-kit to allow seamless multi-wallet support (Freighter, etc.).
+- **Error Handling**: Handled 3 primary wallet/contract error types:
+  1. *Wallet Not Found / Rejected*: Managed gracefully through the UI modal and connection promise catch blocks.
+  2. *Insufficient Balance*: Parsed simulation errors to alert users when they don't have enough testnet XLM.
+  3. *Invalid Contract Status*: Caught on-chain state errors (e.g., #5 InvalidStatus) without crashing the frontend.
+- **Contract Deployment**: The Escrow Smart Contract is successfully deployed on the Soroban Testnet.
+- **Frontend Contract Invocations**: The UI writes to and reads from the contract via transactions built with stellar-sdk.
+- **Event Listening & State Synchronization**: Implemented a background event listener (useContractEvents.ts) that polls server.getEvents() for our contract ID. It displays real-time toast notifications (e.g. init, submit, pprove) directly from the ledger.
 
-> **🏆 Submission for the Stellar Journey to Mastery Program**
-> This repository represents the evolution of TrustFlow AI, from a Level 1 (White Belt) foundation to a fully overhauled, premium Web3 ecosystem ready for Level 2 (Soroban Smart Contracts).
+## 🔗 Live Demo
+*Optional - Add your Vercel or Netlify link here before submitting!*
+**Live Demo:** [Deploy Link Here]
 
----
+## 📝 Smart Contract Details
+- **Network**: Soroban Testnet
+- **Contract Address**: CAYJUZTTDE3IOSJAH6TA4ZJ4QSAXBT2MKV3RGVOFZCVLE43WYP2ZXFD6
+- **Example Transaction Hash (Contract Call)**:
+  - 9b74301cf... (Add an actual tx hash you performed here)
 
-## 🌌 The Vision
-TrustFlow AI bridges the gap between freelancers, clients, and decentralized finance. By leveraging the unmatched speed and low fees of the **Stellar Network**, we provide a trustless, automated, and frictionless payment infrastructure wrapped in a world-class UI.
+## 📸 Screenshots
+### Wallet Options & Integration
+*(Replace the placeholder below with a screenshot of the wallet connection modal)*
+![Wallet Connection](https://placehold.co/600x400/18181b/39FF14?text=Add+Wallet+Screenshot+Here)
 
-## ✨ Key Features (Level 1 Mastery)
-- 🎨 **Premium UI/UX**: An immersive "Deep Space" dark mode featuring glassmorphism, fluid `framer-motion` animations, and neon emerald accents.
-- 🔐 **Seamless Wallet Integration**: One-click connect via the `@stellar/freighter-api`. 
-- 📊 **Real-Time Testnet Data**: Live fetching of XLM balances directly from the Stellar Horizon nodes.
-- ⚡ **Frictionless Transactions**: Peer-to-peer XLM transfers tested and verified, complete with instant transaction hashing and Stellar Expert explorer links.
+### Contract Events in Action
+*(Replace the placeholder below with a screenshot showing the Toast notification from useContractEvents)*
+![Event Listener](https://placehold.co/600x400/18181b/39FF14?text=Add+Event+Toast+Screenshot+Here)
 
----
-
-## 📸 Visual Showcase & User Journey
-
-We believe Web3 shouldn't be clunky. Here is the seamless user experience we've crafted:
-
-<details open>
-<summary><b>1. The Immersive Connect Screen</b></summary>
-<br/>
-<p align="center">
-  <img src="./frontend/public/screenshots/start.png" width="800" alt="Start Screen" />
-</p>
-</details>
-
-<details open>
-<summary><b>2. Connected Dashboard & Live Balance</b></summary>
-<br/>
-<p align="center">
-  <img src="./frontend/public/screenshots/wallet-connected.png" width="800" alt="Wallet Connected" />
-</p>
-</details>
-
-<details open>
-<summary><b>3. Secure Freighter Approval</b></summary>
-<br/>
-<p align="center">
-  <img src="./frontend/public/screenshots/trustflow-ui.png" width="800" alt="Wallet Approval" />
-</p>
-</details>
-
-<details open>
-<summary><b>4. Instant Transaction Verification</b></summary>
-<br/>
-<p align="center">
-  <img src="./frontend/public/screenshots/tx-success.png" width="800" alt="Transaction Success" />
-</p>
-</details>
-
----
-
-## 🚀 Getting Started
-
-Experience the premium UI and Stellar integration locally in just a few steps:
-
-### Prerequisites
-- Node.js (v18+)
-- [Freighter Wallet](https://freighter.app/) extension (Set to **Testnet**)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
+## 🛠️ Setup Instructions
+1. Clone the repository and checkout this branch:
+   \\\ash
    git clone https://github.com/nihatfurkancakmakci/trustflow-ai.git
-   cd trustflow-ai/frontend
-   ```
-
-2. **Install dependencies**
-   ```bash
+   cd trustflow-ai
+   git checkout level-2-yellow-belt
+   \\\
+2. Navigate to the frontend directory and install dependencies:
+   \\\ash
+   cd frontend
    npm install
-   ```
-
-3. **Ignite the server**
-   ```bash
+   \\\
+3. Run the development server:
+   \\\ash
    npm run dev
-   ```
-
-4. **Explore**
-   Open [http://localhost:3000](http://localhost:3000) and step into the future of decentralized work.
-
----
-
-## 🗺️ Roadmap: What's Next? (Level 2 & Beyond)
-With the Level 1 integration and UI overhaul fully completed, we are now architecting **Soroban Smart Contracts** to handle:
-- Escrow systems for milestone-based payments.
-- Trustless dispute resolution.
-- Tokenized reputation scores for freelancers.
-
-<br />
-
-<div align="center">
-  <p>Built with 💚 for the Stellar Ecosystem.</p>
-</div>
+   \\\
+4. Open [http://localhost:3000](http://localhost:3000) and click **Log In with Wallet** to test the StellarWalletsKit implementation!
