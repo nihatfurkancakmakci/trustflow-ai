@@ -128,3 +128,34 @@
     @apply font-sans;
   }
 }
+
+/* Hide number input spin buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b; /* zinc-950 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #39FF14; /* neon green */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2ce610; /* slightly darker for hover */
+}

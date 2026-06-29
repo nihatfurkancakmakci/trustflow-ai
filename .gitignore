@@ -1,0 +1,5 @@
+target/
+rustup-init.exe
+*.py
+scratch/
+.agents/

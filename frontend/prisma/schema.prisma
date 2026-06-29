@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  role          String   // "client" or "freelancer"
+  
+  // Basic Info
+  firstName     String
+  lastName      String
+  email         String   @unique
+  phone         String?
+  location      String?
+
+  // Professional / Company Info
+  bio           String?
+  skills        String?  // Comma separated or JSON string
+  website       String?
+
+  createdAt     DateTime @default(now())
+
+  // Relations
+  clientJobs     Job[] @relation("ClientJobs")
+  freelancerJobs Job[] @relation("FreelancerJobs")
+  reviewsGiven   Review[] @relation("ReviewsGiven")
+  reviewsReceived Review[] @relation("ReviewsReceived")
+}
+
+model Job {
+  id                String   @id @default(cuid())
+  title             String
+  description       String
+  budget            Float?
+  industry          String
+  status            String   @default("open") // open, in_progress, completed, disputed
+  
+  // Detailed fields
+  category          String?
+  scope             String?
+  budgetRange       String?
+  paymentAsset      String?
+  timelineAmount    String?
+  timelineUnit      String?
+  expectedRevisions String?
+  expertise         String?
+  escrowType        String?
+  disputePref       String?
+  penaltyPref       String?
+  ghostingTimelock  String?
+  hostageTimelock   String?
+  
+  clientId          String
+  client            User     @relation("ClientJobs", fields: [clientId], references: [walletAddress])
+  
+  freelancerId      String?
+  freelancer        User?    @relation("FreelancerJobs", fields: [freelancerId], references: [walletAddress])
+  
+  review            Review?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int      // 1 to 5
+  comment     String
+  
+  jobId       String   @unique
+  job         Job      @relation(fields: [jobId], references: [id])
+  
+  reviewerId  String
+  reviewer    User     @relation("ReviewsGiven", fields: [reviewerId], references: [walletAddress])
+  
+  revieweeId  String
+  reviewee    User     @relation("ReviewsReceived", fields: [revieweeId], references: [walletAddress])
+  
+  createdAt   DateTime @default(now())
+}
