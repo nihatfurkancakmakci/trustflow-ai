@@ -1,4 +1,4 @@
-﻿# TrustFlow AI - Level 2 (Yellow Belt) Submission
+# TrustFlow AI - Level 2 (Yellow Belt) Submission
 
 Welcome to the TrustFlow AI Level 2 (Yellow Belt) submission for the **Stellar Journey to Mastery 2.0**. This branch focuses exclusively on **multi-wallet integration, smart contract deployment, error handling, and real-time event synchronization**.
 
@@ -24,12 +24,10 @@ Welcome to the TrustFlow AI Level 2 (Yellow Belt) submission for the **Stellar J
 
 ## 📸 Screenshots
 ### Wallet Options & Integration
-*(Replace the placeholder below with a screenshot of the wallet connection modal)*
-![Wallet Connection](https://placehold.co/600x400/18181b/39FF14?text=Add+Wallet+Screenshot+Here)
+![Wallet Connection](frontend/public/screenshots/wallet-options.png)
 
 ### Contract Events in Action
-*(Replace the placeholder below with a screenshot showing the Toast notification from useContractEvents)*
-![Event Listener](https://placehold.co/600x400/18181b/39FF14?text=Add+Event+Toast+Screenshot+Here)
+![Event Listener](frontend/public/screenshots/realtime-event.png)
 
 ## 🛠️ Setup Instructions
 1. Clone the repository and checkout this branch:
