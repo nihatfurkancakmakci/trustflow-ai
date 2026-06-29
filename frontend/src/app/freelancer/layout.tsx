@@ -58,17 +58,17 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
     <div className="flex flex-col lg:flex-row h-screen bg-black text-white overflow-hidden">
       
       {/* Mobile Header */}
-      <header className="lg:hidden flex justify-between items-center p-4 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-40">
-        <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-green-500" />
-          <span className="font-extrabold text-lg">TrustFlow <span className="text-green-500">FL</span></span>
-        </div>
+      <header className="lg:hidden flex items-center gap-4 p-4 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-40">
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-1.5 rounded-lg hover:bg-white/5 transition-colors focus:outline-none"
         >
           {isMobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
         </button>
+        <div className="flex items-center gap-2">
+          <Zap className="w-5 h-5 text-green-500" />
+          <span className="font-extrabold text-lg">TrustFlow <span className="text-green-500">FL</span></span>
+        </div>
       </header>
 
       {/* Desktop Sidebar */}
@@ -81,22 +81,6 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
         <Suspense fallback={<nav className="flex-1 p-4 space-y-2"></nav>}>
           <FreelancerSidebarNav />
         </Suspense>
-
-        <div className="p-4 border-t border-white/10">
-          <button 
-            onClick={() => { disconnect(); router.push("/"); }}
-            className="flex items-center gap-3 px-4 py-3 w-full hover:bg-red-500/10 rounded-xl text-zinc-400 hover:text-red-400 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Disconnect
-          </button>
-          <button 
-            onClick={() => { localStorage.clear(); window.location.reload(); }}
-            className="flex items-center gap-3 px-4 py-3 mt-2 w-full hover:bg-amber-500/10 rounded-xl text-zinc-500 hover:text-amber-500 transition-colors text-sm"
-          >
-            Reset Test Data
-          </button>
-        </div>
       </aside>
 
       {/* Mobile Drawer Menu */}
@@ -115,19 +99,14 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
               </div>
             </Suspense>
 
-            <div className="p-4 border-t border-white/10 bg-zinc-950">
+            {/* Mobile Drawer Footer with Log Out at the very bottom */}
+            <div className="p-4 border-t border-white/10 bg-zinc-950 mt-auto">
               <button 
                 onClick={() => { disconnect(); router.push("/"); setIsMobileMenuOpen(false); }}
                 className="flex items-center gap-3 px-4 py-3 w-full hover:bg-red-500/10 rounded-xl text-zinc-400 hover:text-red-400 transition-colors"
               >
                 <LogOut className="w-5 h-5" />
-                Disconnect
-              </button>
-              <button 
-                onClick={() => { localStorage.clear(); window.location.reload(); }}
-                className="flex items-center gap-3 px-4 py-3 mt-2 w-full hover:bg-amber-500/10 rounded-xl text-zinc-500 hover:text-amber-500 transition-colors text-sm"
-              >
-                Reset Test Data
+                Log Out
               </button>
             </div>
           </motion.div>
