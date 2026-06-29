@@ -110,16 +110,27 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
               </div>
             </Suspense>
 
-            {/* Mobile Drawer Footer with Log Out at the very bottom */}
-            <div className="p-4 border-t border-white/10 bg-zinc-950 mt-auto">
-              <button 
-                onClick={() => { disconnect(); router.push("/"); setIsMobileMenuOpen(false); }}
-                className="flex items-center gap-3 px-4 py-3 w-full hover:bg-red-500/10 rounded-xl text-zinc-400 hover:text-red-400 transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                Log Out
-              </button>
-            </div>
+            {/* Mobile Drawer Footer with Profile Card & Log Out */}
+            {userProfile && (
+              <div className="p-4 border-t border-white/10 bg-zinc-950 mt-auto flex flex-col gap-3">
+                <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                  <div className="w-10 h-10 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center font-bold text-lg shrink-0">
+                    {(userProfile.firstName || "?").charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white hover:underline">{userProfile.firstName || ""} {userProfile.lastName || ""}</p>
+                    <p className="text-xs text-zinc-500 font-mono">{userProfile.walletAddress.slice(0,6)}...{userProfile.walletAddress.slice(-4)}</p>
+                  </div>
+                </Link>
+                <button 
+                  onClick={() => { disconnect(); router.push("/"); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-center gap-3 px-4 py-2.5 w-full bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-400 font-bold transition-colors text-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log Out
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
