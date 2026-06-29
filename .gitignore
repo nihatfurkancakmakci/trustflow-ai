@@ -1,0 +1,8 @@
+target/
+rustup-init.exe
+*.py
+scratch/
+.agents/
+frontend/.next/
+frontend/node_modules/
+frontend/prisma/dev.db
