@@ -3,3 +3,22 @@ rustup-init.exe
 *.py
 scratch/
 .agents/
+
+# Environment variables (contains API keys!)
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# Next.js build
+.next/
+
+# Database
+*.db
+*.db-journal
+
+# OS files
+.DS_Store
+Thumbs.db

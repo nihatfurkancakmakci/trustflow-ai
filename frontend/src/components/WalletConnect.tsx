@@ -10,10 +10,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function WalletConnect() {
-  const { address, isConnecting, connect, userProfile } = useWallet();
+  const { address, connect, userProfile } = useWallet();
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [isConnecting, setIsConnecting] = useState(false);
 
   // Auto redirect if already connected
   useEffect(() => {
@@ -24,9 +25,13 @@ export function WalletConnect() {
   }, [address, userProfile, router, redirecting]);
 
   const handleLogin = async () => {
+    setIsConnecting(true);
     try {
       const result = await connect();
-      if (!result.address) return; // User closed modal
+      if (!result.address) {
+        setIsConnecting(false);
+        return; // User closed modal
+      }
       
       if (result.profile) {
         toast.success("Welcome back!");
@@ -35,6 +40,7 @@ export function WalletConnect() {
       } else {
         toast.error("Account not found. Please switch to the Sign Up tab to register.");
         setActiveTab("register");
+        setIsConnecting(false);
       }
     } catch (e: any) {
       if (e.message?.includes("rejected") || e.message?.includes("User declined")) {
@@ -45,13 +51,18 @@ export function WalletConnect() {
         toast.error("Failed to connect wallet.");
       }
       setRedirecting(false);
+      setIsConnecting(false);
     }
   };
 
   const handleRegisterConnect = async () => {
+    setIsConnecting(true);
     try {
       const result = await connect();
-      if (!result.address) return; // User closed modal
+      if (!result.address) {
+        setIsConnecting(false);
+        return; // User closed modal
+      }
       
       if (result.profile) {
         toast.error("An account with this wallet already exists. Logging you in instead!");
@@ -71,6 +82,7 @@ export function WalletConnect() {
         toast.error("Failed to connect wallet.");
       }
       setRedirecting(false);
+      setIsConnecting(false);
     }
   };
 

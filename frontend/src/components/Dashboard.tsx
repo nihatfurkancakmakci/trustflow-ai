@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, UserCircle, PlusCircle, Search, Calendar, DollarSign, Send, FileCode2, Info, Edit, Trash2, TrendingUp, Users, CheckCircle, Clock, Lock, GitCommit } from "lucide-react";
+import { Briefcase, UserCircle, PlusCircle, Search, Calendar, DollarSign, Send, FileCode2, Info, Edit, Trash2, TrendingUp, Users, CheckCircle, Clock, Lock, GitCommit, Brain, Sparkles, AlertTriangle, CheckCircle2, Wrench } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -68,6 +68,8 @@ export interface JobData {
   penaltyPref: string;
   ghostingTimelock: string;
   hostageTimelock: string;
+  budget?: number;
+  description?: string;
 }
 
 const MOCK_JOBS: JobData[] = [
@@ -115,7 +117,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   const searchParams = useSearchParams();
   const router = useRouter();
   const [role, setRole] = useState<"freelancer" | "client">(initialRole);
-  const { initEscrow, submitMilestone, approveMilestone, dispute, isTxPending } = useEscrowContract();
+  const { initEscrow, submitMilestone, approveMilestone, requestRevision, dispute, isTxPending } = useEscrowContract();
   
   // Sync tab with URL if available
   const tabQuery = searchParams?.get("tab") as "board" | "active" | "create" | "proposals" | "discover" | "workrooms" | "dashboard" | "workroom_detail" | null;
@@ -191,6 +193,52 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<number | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedWorkroom, setSelectedWorkroom] = useState<ProposalData | null>(null);
+
+  // AI Review States
+  const [aiReviews, setAiReviews] = useState<Record<string, any>>({});
+  const [loadingAiReview, setLoadingAiReview] = useState<Record<string, boolean>>({});
+
+  // Fetch AI reviews dynamically when a workroom is selected and has submitted milestones
+  useEffect(() => {
+    if (selectedWorkroom) {
+      selectedWorkroom.milestones.forEach((m) => {
+        if (m.status === "SUBMITTED") {
+          const cacheKey = `${selectedWorkroom.jobId}-${m.id}`;
+          if (!aiReviews[cacheKey] && !loadingAiReview[cacheKey]) {
+            setLoadingAiReview(prev => ({ ...prev, [cacheKey]: true }));
+            
+            const jobDetail = jobs.find(j => j.id === selectedWorkroom.jobId) || {
+              title: "Freelance Project",
+              scope: selectedWorkroom.acceptanceCriteria || "No project scope details provided."
+            };
+            
+            const deliveryNotes = m.commits?.map(c => c.message).join("\n\n") || "No delivery logs provided.";
+            
+            fetch("/api/ai-review", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                jobTitle: jobDetail.title,
+                jobDescription: jobDetail.scope,
+                milestoneDescription: m.name,
+                deliveryNotes: deliveryNotes
+              })
+            })
+              .then(r => r.json())
+              .then(data => {
+                if (data.success && data.review) {
+                  setAiReviews(prev => ({ ...prev, [cacheKey]: data.review }));
+                }
+              })
+              .catch(e => console.error("Error fetching AI review:", e))
+              .finally(() => {
+                setLoadingAiReview(prev => ({ ...prev, [cacheKey]: false }));
+              });
+          }
+        }
+      });
+    }
+  }, [selectedWorkroom, role, jobs, aiReviews, loadingAiReview]);
 
   // ---- Persistence Effects ----
   useEffect(() => {
@@ -1168,7 +1216,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                         </div>
                         <p className="text-sm text-zinc-400 mb-4 break-words line-clamp-3" title={fl.title}>{fl.title}</p>
                         <div className="flex flex-wrap gap-2 mb-6">
-                          {fl.skills.map(s => <span key={s} className="bg-white/5 border border-white/10 text-xs px-2 py-1 rounded text-zinc-300">{s}</span>)}
+                          {fl.skills.map((s: string) => <span key={s} className="bg-white/5 border border-white/10 text-xs px-2 py-1 rounded text-zinc-300">{s}</span>)}
                         </div>
                       </div>
                       <div className="flex justify-between items-center border-t border-white/5 pt-4">
@@ -1454,38 +1502,169 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                 </motion.div>
                               )}
 
-                              {/* Client Actions */}
-                              {role === "client" && mStatus === "SUBMITTED" && (
-                                <div className="space-y-4">
-                                  <div className="bg-indigo-950/30 border border-indigo-500/20 p-4 rounded-xl flex items-start gap-3">
-                                    <div className="bg-indigo-500/20 p-2 rounded-lg"><Info className="w-5 h-5 text-indigo-400" /></div>
-                                    <div>
-                                      <h4 className="text-indigo-400 font-bold text-sm">TrustFlow AI Analysis</h4>
-                                      <p className="text-xs text-zinc-400 mt-1">
-                                        The AI reviewed the commits. Found 2 potential issues with the layout on mobile.
-                                        <br/><strong className="text-indigo-300">Recommendation:</strong> Consider requesting a revision for this milestone.
-                                      </p>
-                                    </div>
+                              {/* Dynamic AI Review Results */}
+                              {mStatus === "SUBMITTED" && (() => {
+                                const cacheKey = `${selectedWorkroom.jobId}-${m.id}`;
+                                const isLoading = loadingAiReview[cacheKey];
+                                const review = aiReviews[cacheKey];
+
+                                return (
+                                  <div className="space-y-4 mt-4">
+                                    {isLoading ? (
+                                      <div className="bg-indigo-950/10 border border-indigo-500/20 p-5 rounded-2xl animate-pulse space-y-3">
+                                        <div className="flex items-center gap-2">
+                                          <Brain className="w-5 h-5 text-indigo-400 animate-bounce" />
+                                          <h4 className="text-indigo-400 font-bold text-sm">TrustFlow AI is analyzing this delivery...</h4>
+                                        </div>
+                                        <div className="h-2 bg-indigo-500/10 rounded w-3/4"></div>
+                                        <div className="h-2 bg-indigo-500/10 rounded w-1/2"></div>
+                                      </div>
+                                    ) : review ? (
+                                      <motion.div 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="bg-zinc-900/60 border border-indigo-500/30 p-5 rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.1)] space-y-4"
+                                      >
+                                        <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                                          <div className="flex items-center gap-2">
+                                            <Brain className="w-5 h-5 text-indigo-400" />
+                                            <h4 className="text-white font-bold text-sm">TrustFlow AI Audit</h4>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-[10px] text-zinc-500 font-mono">Conf: {review.aiConfidence}%</span>
+                                            <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                                              review.score >= 80 ? "bg-green-500/10 text-green-400 border border-green-500/20" :
+                                              review.score >= 60 ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                                              "bg-red-500/10 text-red-400 border border-red-500/20"
+                                            }`}>
+                                              Score: {review.score}/100
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs text-zinc-500 uppercase tracking-wider font-bold">Recommendation:</span>
+                                            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                                              review.recommendation === "APPROVE" ? "bg-green-500/20 text-green-400 border border-green-500/30" :
+                                              review.recommendation === "REVISION_NEEDED" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                                              "bg-red-500/20 text-red-400 border border-red-500/30"
+                                            }`}>
+                                              {review.recommendation}
+                                            </span>
+                                          </div>
+                                          <p className="text-xs text-zinc-300 leading-relaxed bg-black/30 p-3 rounded-xl border border-white/5">
+                                            {review.summary}
+                                          </p>
+                                        </div>
+
+                                        {/* Strengths & Concerns */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] pt-1">
+                                          {review.strengths && review.strengths.length > 0 && (
+                                            <div className="space-y-1.5 bg-green-500/5 p-3 rounded-xl border border-green-500/10">
+                                              <span className="font-bold text-green-400 flex items-center gap-1">
+                                                <CheckCircle2 className="w-3.5 h-3.5" /> Strengths
+                                              </span>
+                                              <ul className="space-y-1 text-zinc-400 list-disc list-inside">
+                                                {review.strengths.slice(0, 3).map((s: string, sIdx: number) => (
+                                                  <li key={sIdx} className="line-clamp-2">{s}</li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                          )}
+                                          
+                                          {review.concerns && review.concerns.length > 0 && (
+                                            <div className="space-y-1.5 bg-red-500/5 p-3 rounded-xl border border-red-500/10">
+                                              <span className="font-bold text-red-400 flex items-center gap-1">
+                                                <AlertTriangle className="w-3.5 h-3.5" /> Concerns
+                                              </span>
+                                              <ul className="space-y-1 text-zinc-400 list-disc list-inside">
+                                                {review.concerns.slice(0, 3).map((c: string, cIdx: number) => (
+                                                  <li key={cIdx} className="line-clamp-2">{c}</li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                          )}
+                                        </div>
+
+                                        {/* Revision Suggestions */}
+                                        {review.recommendation !== "APPROVE" && review.revisionSuggestions && review.revisionSuggestions.length > 0 && (
+                                          <div className="bg-amber-500/5 p-3 rounded-xl border border-amber-500/10 space-y-1.5 text-[11px]">
+                                            <span className="font-bold text-amber-400 flex items-center gap-1">
+                                              <Wrench className="w-3.5 h-3.5" /> Actionable Revision Suggestions
+                                            </span>
+                                            <ul className="space-y-1 text-zinc-400 list-disc list-inside">
+                                              {review.revisionSuggestions.slice(0, 3).map((s: string, sIdx: number) => (
+                                                <li key={sIdx} className="line-clamp-2">{s}</li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        )}
+                                      </motion.div>
+                                    ) : (
+                                      <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                                        <span className="text-xs text-zinc-400">AI review was not generated or failed to load.</span>
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          onClick={() => {
+                                            const jobDetail = jobs.find(j => j.id === selectedWorkroom.jobId) || {
+                                              title: "Freelance Project",
+                                              scope: selectedWorkroom.acceptanceCriteria || "No project scope details provided."
+                                            };
+                                            const deliveryNotes = m.commits?.map(c => c.message).join("\n\n") || "No delivery logs provided.";
+                                            setLoadingAiReview(prev => ({ ...prev, [cacheKey]: true }));
+                                            fetch("/api/ai-review", {
+                                              method: "POST",
+                                              headers: { "Content-Type": "application/json" },
+                                              body: JSON.stringify({
+                                                jobTitle: jobDetail.title,
+                                                jobDescription: jobDetail.scope,
+                                                milestoneDescription: m.name,
+                                                deliveryNotes: deliveryNotes
+                                              })
+                                            })
+                                              .then(r => r.json())
+                                              .then(data => {
+                                                if (data.success && data.review) {
+                                                  setAiReviews(prev => ({ ...prev, [cacheKey]: data.review }));
+                                                }
+                                              })
+                                              .catch(e => console.error("Error fetching AI review:", e))
+                                              .finally(() => {
+                                                setLoadingAiReview(prev => ({ ...prev, [cacheKey]: false }));
+                                              });
+                                          }}
+                                          className="text-xs text-indigo-400 hover:text-indigo-300"
+                                        >
+                                          <Sparkles className="w-3.5 h-3.5 mr-1" /> Retry AI Audit
+                                        </Button>
+                                      </div>
+                                    )}
+
+                                    {/* Client Action Buttons */}
+                                    {role === "client" && (
+                                      <div className="flex flex-col gap-3">
+                                        <Button 
+                                          onClick={() => handleRequestRevision(m.id, i)}
+                                          disabled={isTxPending}
+                                          variant="outline"
+                                          className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500 transition-all font-bold"
+                                        >
+                                          {isTxPending ? "Processing..." : "Request Revision"}
+                                        </Button>
+                                        <Button 
+                                          onClick={() => handleApproveMilestone(m.id, i)}
+                                          disabled={isTxPending}
+                                          className="w-full bg-green-500 hover:bg-green-600 text-black font-bold shadow-[0_0_15px_rgba(34,197,94,0.3)] disabled:opacity-50"
+                                        >
+                                          {isTxPending ? "Processing..." : "Approve & Release"}
+                                        </Button>
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="flex flex-col gap-3">
-                                    <Button 
-                                      onClick={() => handleRequestRevision(m.id, i)}
-                                      disabled={isTxPending}
-                                      variant="outline"
-                                      className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500 transition-all"
-                                    >
-                                      {isTxPending ? "Processing..." : "Request Revision"}
-                                    </Button>
-                                    <Button 
-                                      onClick={() => handleApproveMilestone(m.id, i)}
-                                      disabled={isTxPending}
-                                      className="w-full bg-green-500 hover:bg-green-600 text-black font-bold shadow-[0_0_15px_rgba(34,197,94,0.3)] disabled:opacity-50"
-                                    >
-                                      {isTxPending ? "Processing..." : "Approve & Release"}
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
+                                );
+                              })()}
                             </div>
                           )}
                         </div>
