@@ -59,4 +59,18 @@ describe("TrustFlow AI - Dashboard & AI Review Engine", () => {
     expect(review.recommendation).toBe("REJECT");
     expect(review.concerns).toContain("Delivery notes are too brief — more detail would help the client understand the work done");
   });
+
+  it("should request revision if delivery has medium details but minor gaps", () => {
+    const review = localAnalyze(
+      "Soroban AMM Smart Contract Development",
+      "Develop a constant-product AMM in Rust using soroban-sdk. Needs full test coverage.",
+      "Milestone 1: Implement pool creation",
+      "I built the basic pool structure and initialized the contract but didn't write unit tests yet. Deployed to testnet.",
+      "https://testnet.stellar.org"
+    );
+
+    expect(review.score).toBeGreaterThanOrEqual(45);
+    expect(review.score).toBeLessThan(75);
+    expect(review.recommendation).toBe("REVISION_NEEDED");
+  });
 });
