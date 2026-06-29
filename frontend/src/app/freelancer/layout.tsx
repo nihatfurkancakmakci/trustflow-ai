@@ -81,6 +81,17 @@ export default function FreelancerLayout({ children }: { children: React.ReactNo
         <Suspense fallback={<nav className="flex-1 p-4 space-y-2"></nav>}>
           <FreelancerSidebarNav />
         </Suspense>
+
+        {/* Desktop Sidebar Footer - Log Out at the very bottom */}
+        <div className="p-4 border-t border-white/10 bg-zinc-950 mt-auto">
+          <button 
+            onClick={() => { disconnect(); router.push("/"); }}
+            className="flex items-center gap-3 px-4 py-3 w-full hover:bg-red-500/10 rounded-xl text-zinc-400 hover:text-red-400 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            Log Out
+          </button>
+        </div>
       </aside>
 
       {/* Mobile Drawer Menu */}
