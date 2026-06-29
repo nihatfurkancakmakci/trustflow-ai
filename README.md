@@ -13,8 +13,8 @@ Welcome to the TrustFlow AI Level 2 (Yellow Belt) submission for the **Stellar J
 - **Event Listening & State Synchronization**: Implemented a background event listener (useContractEvents.ts) that polls server.getEvents() for our contract ID. It displays real-time toast notifications (e.g. init, submit, pprove) directly from the ledger.
 
 ## 🔗 Live Demo
-*Optional - Add your Vercel or Netlify link here before submitting!*
-**Live Demo:** [Deploy Link Here]
+*Optional - Local demonstration is primarily used for this Level 2 submission.*
+**Live Demo:** Localhost only (See setup instructions below)
 
 ## 📝 Smart Contract Details
 - **Network**: Soroban Testnet
