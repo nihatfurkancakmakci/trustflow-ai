@@ -1,6 +1,6 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { rpc } from '@stellar/stellar-sdk';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const SERVER_URL = "https://soroban-testnet.stellar.org";
 const CONTRACT_ID = "CAYJUZTTDE3IOSJAH6TA4ZJ4QSAXBT2MKV3RGVOFZCVLE43WYP2ZXFD6";
@@ -36,17 +36,17 @@ export function useContractEvents() {
               const eventType = topicVal ? topicVal.toString() : "Unknown Event";
               
               if (eventType === "init") {
-                toast.success(🎉 Smart Contract: New Escrow Initialized!);
+                toast.success("🎉 Smart Contract: New Escrow Initialized!");
               } else if (eventType === "submit") {
-                toast.success(✅ Smart Contract: Milestone Submitted!);
+                toast.success("✅ Smart Contract: Milestone Submitted!");
               } else if (eventType === "approve") {
-                toast.success(💰 Smart Contract: Milestone Approved & Funds Released!);
+                toast.success("💰 Smart Contract: Milestone Approved & Funds Released!");
               } else if (eventType === "dispute") {
-                toast.error(⚠️ Smart Contract: Dispute Raised!);
+                toast.error("⚠️ Smart Contract: Dispute Raised!");
               } else if (eventType === "revision") {
-                toast.error(🔄 Smart Contract: Revision Requested!);
+                toast.error("🔄 Smart Contract: Revision Requested!");
               } else {
-                toast(🔗 Smart Contract Event: );
+                toast(`🔗 Smart Contract Event: ${eventType}`);
               }
             }
           });
