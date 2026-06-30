@@ -46,8 +46,8 @@ export interface ProposalData {
 interface ContractTemplateProps {
   data: ProposalData;
   viewMode: "client" | "freelancer";
-  onAction: () => void;
-  actionText: string;
+  onAction?: () => void;
+  actionText?: string;
   onDecline?: () => void;
   onCounterOffer?: () => void;
 }
