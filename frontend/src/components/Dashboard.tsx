@@ -203,6 +203,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   const [reviewComment, setReviewComment] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
   const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
+  const [workroomFilter, setWorkroomFilter] = useState<"active" | "completed" | "disputed">("active");
 
   // Local proposal cache cleanup for outdated test job
   useEffect(() => {
@@ -819,10 +820,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                   Pending Proposals <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => p.status.startsWith("PENDING")).length}</span>
                 </button>
                 <button onClick={() => {setActiveTab("workrooms"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "workrooms" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
-                  Workrooms <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length}</span>
-                </button>
-                <button onClick={() => {setActiveTab("past"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "past" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
-                  Past Jobs <span className="bg-zinc-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).length}</span>
+                  My Workrooms <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED", "COMPLETED", "DISPUTED"].includes(p.status)).length}</span>
                 </button>
               </div>
             )}
@@ -1045,6 +1043,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                               if (prop.status === "PENDING_FL") {
                                 setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? { ...p, status: "ACCEPTED" } : p));
                                 toast.success("Counter Offer Signed! Contract is now locked.");
+                                setActiveTab("workrooms");
                               } else {
                                 toast.info("Waiting for Client to fund the escrow.");
                               }
@@ -1060,64 +1059,72 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
               </div>
             )}
 
-            {/* View: Active Escrows (Workrooms) (FL) */}
+            {/* View: Unified Workrooms (FL) */}
             {activeTab === "workrooms" && (
-              <div className="space-y-10">
-                {submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length === 0 ? (
-                  <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-white/10">
-                     <Briefcase className="w-10 h-10 text-zinc-600 mx-auto mb-4" />
-                     <h3 className="text-xl font-bold text-zinc-400">No active escrows</h3>
-                     <p className="text-zinc-500 mt-2">Contracts will appear here once both parties accept the terms.</p>
-                  </div>
-                ) : (
-                  submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).map((prop, i) => (
-                    <div key={i} className="space-y-4">
-                      <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> 
-                        Contract Active for Job: {prop.jobId}
-                      </h3>
-                      <ContractTemplate 
-                          data={prop}
-                          viewMode="freelancer"
-                          onAction={() => { setSelectedWorkroom(prop); setActiveTab("workroom_detail"); }}
-                          actionText="View Workroom"
-                      />
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            {/* View: Past Jobs (Both FL & Client) */}
-            {activeTab === "past" && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                {submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).length === 0 ? (
-                  <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-white/10">
-                    <h3 className="text-xl font-bold text-zinc-400">No past jobs</h3>
-                    <p className="text-zinc-500 mt-2">Finished or disputed contracts will appear here.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-6">
-                    {submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).map((prop, i) => (
-                      <div key={i} className={`bg-zinc-900/50 border p-5 rounded-2xl ${prop.status === "DISPUTED" ? "border-red-500/30 hover:border-red-500/50" : "border-emerald-500/30 hover:border-emerald-500/50"} transition-colors`}>
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                              <span className={`w-2 h-2 rounded-full ${prop.status === "DISPUTED" ? "bg-red-500" : "bg-emerald-500"}`}></span>
-                              Job ID: {prop.jobId}
-                            </h4>
-                            <p className="text-sm text-zinc-400 mt-1">Freelancer: {prop.freelancerAddress}</p>
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${prop.status === "DISPUTED" ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"}`}>
-                            {prop.status}
-                          </span>
+              <div className="space-y-6">
+                <div className="flex gap-2 mb-6">
+                   <button onClick={() => setWorkroomFilter("active")} className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${workroomFilter === "active" ? "bg-blue-500/20 text-blue-400 border-blue-500/50" : "bg-black/50 text-zinc-500 border-white/5 hover:text-white"}`}>Active</button>
+                   <button onClick={() => setWorkroomFilter("completed")} className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${workroomFilter === "completed" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50" : "bg-black/50 text-zinc-500 border-white/5 hover:text-white"}`}>Completed</button>
+                   <button onClick={() => setWorkroomFilter("disputed")} className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${workroomFilter === "disputed" ? "bg-red-500/20 text-red-400 border-red-500/50" : "bg-black/50 text-zinc-500 border-white/5 hover:text-white"}`}>Disputed</button>
+                </div>
+                
+                {(() => {
+                   const filteredProps = submittedProposals.filter(p => {
+                      if (workroomFilter === "active") return ["ACCEPTED", "DELIVERED"].includes(p.status);
+                      if (workroomFilter === "completed") return p.status === "COMPLETED";
+                      if (workroomFilter === "disputed") return p.status === "DISPUTED";
+                      return false;
+                   });
+                   
+                   if (filteredProps.length === 0) {
+                      return (
+                        <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-white/10">
+                          <Briefcase className="w-10 h-10 text-zinc-600 mx-auto mb-4" />
+                          <h3 className="text-xl font-bold text-zinc-400">No {workroomFilter} jobs</h3>
+                          <p className="text-zinc-500 mt-2">Check back later or filter by another status.</p>
                         </div>
-                        <ContractTemplate data={prop} viewMode={role} onAction={() => {}} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
+                      );
+                   }
+                   
+                   return (
+                     <div className="grid grid-cols-1 gap-6">
+                       {filteredProps.map((prop, i) => (
+                          <div key={i} className={`bg-zinc-900/50 border p-5 rounded-2xl transition-colors ${
+                            prop.status === "DISPUTED" ? "border-red-500/30 hover:border-red-500/50" : 
+                            prop.status === "COMPLETED" ? "border-emerald-500/30 hover:border-emerald-500/50" :
+                            "border-blue-500/30 hover:border-blue-500/50"
+                          }`}>
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                                  <span className={`w-2 h-2 rounded-full ${
+                                    prop.status === "DISPUTED" ? "bg-red-500" : 
+                                    prop.status === "COMPLETED" ? "bg-emerald-500" :
+                                    "bg-blue-500 animate-pulse"
+                                  }`}></span>
+                                  Job ID: {prop.jobId}
+                                </h4>
+                              </div>
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                                prop.status === "DISPUTED" ? "bg-red-500/20 text-red-400 border border-red-500/30" : 
+                                prop.status === "COMPLETED" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" :
+                                "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                              }`}>
+                                {prop.status}
+                              </span>
+                            </div>
+                            <ContractTemplate 
+                                data={prop}
+                                viewMode="freelancer"
+                                onAction={() => { setSelectedWorkroom(prop); setActiveTab("workroom_detail"); }}
+                                actionText={workroomFilter === "active" ? "Open Workroom" : "View Details"}
+                            />
+                          </div>
+                       ))}
+                     </div>
+                   );
+                })()}
+              </div>
             )}
           </motion.div>
         )}
