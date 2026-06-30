@@ -577,9 +577,18 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
     e.preventDefault();
     if (!counterMode) return;
 
+    // Recalculate milestone amounts based on new counterBidAmount
+    const finalMilestones = counterMode.milestones.length > 0
+      ? counterMode.milestones.map(m => ({
+          ...m,
+          amount: counterBidAmount && m.percentage ? (Number(counterBidAmount) * m.percentage) / 100 : (counterMode.milestones.length === 1 ? Number(counterBidAmount) : m.amount)
+        }))
+      : [{ id: 1, name: "Final Delivery", percentage: 100, status: "PENDING", amount: Number(counterBidAmount) }];
+
     // Update the submitted proposal array locally
     const updatedProposal: ProposalData = {
       ...counterMode,
+      milestones: finalMilestones,
       paymentAsset: counterMode.paymentAsset || "USDC",
       timeLocks: `${counterDeliveryAmount} ${counterDeliveryUnit} (Absolute UTC Timestamp)`,
       revisions: counterRevisions,
