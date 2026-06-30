@@ -19,6 +19,7 @@ export interface Milestone {
 }
 
 export interface ProposalData {
+  id?: string;
   jobId: string;
   freelancerAddress: string;
   status: "PENDING_CLIENT" | "PENDING_FL" | "ACCEPTED" | "DECLINED" | "DELIVERED" | "COMPLETED" | "DISPUTED";
