@@ -146,16 +146,25 @@ export function useStellarWallet() {
         networkPassphrase: "Test SDF Network ; September 2015" 
       });
       
-      // Freighter v6 returns an object with signedTxXdr
+      // Freighter returns an object with signedTxXdr
       if (result && typeof result === "object") {
-        if (result.error) throw new Error(result.error);
-        return result.signedTxXdr || (result as any).signedTransaction;
+        if (result.error) {
+          const msg = typeof result.error === "object" && (result.error as any).message 
+            ? (result.error as any).message 
+            : String(result.error);
+          throw new Error(msg);
+        }
+        const signed = result.signedTxXdr || (result as any).signedTransaction;
+        if (!signed) throw new Error("Transaction was not signed");
+        return signed;
       }
       
+      if (!result) throw new Error("Transaction was not signed");
       return result;
-    } catch (e) {
+    } catch (e: any) {
       console.error("Signing failed:", e);
-      return null;
+      const errMsg = e?.message || (typeof e === "string" ? e : JSON.stringify(e)) || "Transaction rejected by user";
+      throw new Error(errMsg);
     }
   }, []);
 
