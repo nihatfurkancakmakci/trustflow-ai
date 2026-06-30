@@ -1462,10 +1462,10 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                 </div>
 
                 {/* Actions */}
-                <div className="bg-black/50 rounded-2xl p-4 sm:p-6 border border-white/5 flex flex-col justify-center space-y-6">
+                <div className="flex flex-col justify-center space-y-6">
 
                   {/* Milestones & Commits (Timeline) */}
-                  <div className="bg-black/50 rounded-2xl p-4 sm:p-6 border border-white/5">
+                  <div className="bg-black/50 rounded-2xl p-3 sm:p-6 border border-white/5">
                     <h3 className="text-xl font-bold text-white mb-6">Milestones & Commits</h3>
                     <div className="space-y-8">
                       {selectedWorkroom.milestones.map((m, i) => {
@@ -1597,7 +1597,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                       <motion.div 
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className="bg-zinc-900/60 border border-indigo-500/30 p-5 rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.1)] space-y-4"
+                                        className="bg-zinc-900/60 border border-indigo-500/30 p-3 sm:p-5 rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.1)] space-y-4"
                                       >
                                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pb-3 border-b border-white/5 gap-2">
                                           <div className="flex items-center gap-2">
@@ -1627,7 +1627,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                               {review.recommendation}
                                             </span>
                                           </div>
-                                          <p className="text-xs text-zinc-300 leading-relaxed bg-black/30 p-3 rounded-xl border border-white/5 break-words">
+                                          <p className="text-xs text-zinc-300 leading-relaxed bg-black/30 p-2 sm:p-3 rounded-xl border border-white/5 break-words">
                                             {review.summary}
                                           </p>
                                         </div>
@@ -1635,7 +1635,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                         {/* Strengths & Concerns */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] pt-1">
                                           {review.strengths && review.strengths.length > 0 && (
-                                            <div className="space-y-1.5 bg-green-500/5 p-3 rounded-xl border border-green-500/10">
+                                            <div className="space-y-1.5 bg-green-500/5 p-2 sm:p-3 rounded-xl border border-green-500/10">
                                               <span className="font-bold text-green-400 flex items-center gap-1">
                                                 <CheckCircle2 className="w-3.5 h-3.5" /> Strengths
                                               </span>
@@ -1648,7 +1648,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                           )}
                                           
                                           {review.concerns && review.concerns.length > 0 && (
-                                            <div className="space-y-1.5 bg-red-500/5 p-3 rounded-xl border border-red-500/10">
+                                            <div className="space-y-1.5 bg-red-500/5 p-2 sm:p-3 rounded-xl border border-red-500/10">
                                               <span className="font-bold text-red-400 flex items-center gap-1">
                                                 <AlertTriangle className="w-3.5 h-3.5" /> Concerns
                                               </span>
@@ -1663,7 +1663,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
 
                                         {/* Revision Suggestions */}
                                         {review.recommendation !== "APPROVE" && review.revisionSuggestions && review.revisionSuggestions.length > 0 && (
-                                          <div className="bg-amber-500/5 p-3 rounded-xl border border-amber-500/10 space-y-1.5 text-[11px]">
+                                          <div className="bg-amber-500/5 p-2 sm:p-3 rounded-xl border border-amber-500/10 space-y-1.5 text-[11px]">
                                             <span className="font-bold text-amber-400 flex items-center gap-1">
                                               <Wrench className="w-3.5 h-3.5" /> Actionable Revision Suggestions
                                             </span>
