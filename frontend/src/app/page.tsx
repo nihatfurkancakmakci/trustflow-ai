@@ -1,5 +1,6 @@
 import { WalletConnect } from "@/components/WalletConnect";
 
+// Trigger fresh Vercel build for Level 3 Orange Belt
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-black relative overflow-hidden">
