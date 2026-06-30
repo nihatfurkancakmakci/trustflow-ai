@@ -579,7 +579,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
           ...m,
           amount: counterBidAmount && m.percentage ? (Number(counterBidAmount) * m.percentage) / 100 : (counterMode.milestones.length === 1 ? Number(counterBidAmount) : m.amount)
         }))
-      : [{ id: 1, name: "Final Delivery", percentage: 100, status: "PENDING", amount: Number(counterBidAmount) }];
+      : [{ id: 1, name: "Final Delivery", percentage: 100, status: "PENDING" as const, amount: Number(counterBidAmount) }];
 
     // Update the submitted proposal array locally
     const updatedProposal: ProposalData = {
