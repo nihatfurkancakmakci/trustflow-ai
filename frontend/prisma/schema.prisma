@@ -11,39 +11,40 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  walletAddress String   @unique
-  role          String   // "client" or "freelancer"
-  
+  id            String @id @default(cuid())
+  walletAddress String @unique
+  role          String // "client" or "freelancer"
+
   // Basic Info
-  firstName     String
-  lastName      String
-  email         String   @unique
-  phone         String?
-  location      String?
+  firstName String
+  lastName  String
+  email     String  @unique
+  phone     String?
+  location  String?
 
   // Professional / Company Info
-  bio           String?
-  skills        String?  // Comma separated or JSON string
-  website       String?
+  bio     String?
+  skills  String? // Comma separated or JSON string
+  website String?
 
-  createdAt     DateTime @default(now())
+  createdAt DateTime @default(now())
 
   // Relations
-  clientJobs     Job[] @relation("ClientJobs")
-  freelancerJobs Job[] @relation("FreelancerJobs")
-  reviewsGiven   Review[] @relation("ReviewsGiven")
-  reviewsReceived Review[] @relation("ReviewsReceived")
+  clientJobs      Job[]      @relation("ClientJobs")
+  freelancerJobs  Job[]      @relation("FreelancerJobs")
+  reviewsGiven    Review[]   @relation("ReviewsGiven")
+  reviewsReceived Review[]   @relation("ReviewsReceived")
+  proposals       Proposal[] @relation("FreelancerProposals")
 }
 
 model Job {
-  id                String   @id @default(cuid())
-  title             String
-  description       String
-  budget            Float?
-  industry          String
-  status            String   @default("open") // open, in_progress, completed, disputed
-  
+  id          String @id @default(cuid())
+  title       String
+  description String
+  budget      Float?
+  industry    String
+  status      String @default("open") // open, in_progress, completed, disputed
+
   // Detailed fields
   category          String?
   scope             String?
@@ -58,31 +59,69 @@ model Job {
   penaltyPref       String?
   ghostingTimelock  String?
   hostageTimelock   String?
-  
-  clientId          String
-  client            User     @relation("ClientJobs", fields: [clientId], references: [walletAddress])
-  
-  freelancerId      String?
-  freelancer        User?    @relation("FreelancerJobs", fields: [freelancerId], references: [walletAddress])
-  
-  review            Review?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+
+  clientId String
+  client   User   @relation("ClientJobs", fields: [clientId], references: [walletAddress])
+
+  freelancerId String?
+  freelancer   User?   @relation("FreelancerJobs", fields: [freelancerId], references: [walletAddress])
+
+  review    Review?
+  proposals Proposal[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Review {
-  id          String   @id @default(cuid())
-  rating      Int      // 1 to 5
-  comment     String
-  
-  jobId       String   @unique
-  job         Job      @relation(fields: [jobId], references: [id])
-  
-  reviewerId  String
-  reviewer    User     @relation("ReviewsGiven", fields: [reviewerId], references: [walletAddress])
-  
-  revieweeId  String
-  reviewee    User     @relation("ReviewsReceived", fields: [revieweeId], references: [walletAddress])
-  
-  createdAt   DateTime @default(now())
+  id      String @id @default(cuid())
+  rating  Int // 1 to 5
+  comment String
+
+  jobId String @unique
+  job   Job    @relation(fields: [jobId], references: [id])
+
+  reviewerId String
+  reviewer   User   @relation("ReviewsGiven", fields: [reviewerId], references: [walletAddress])
+
+  revieweeId String
+  reviewee   User   @relation("ReviewsReceived", fields: [revieweeId], references: [walletAddress])
+
+  createdAt DateTime @default(now())
+}
+
+model Proposal {
+  id String @id @default(cuid())
+
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id])
+
+  freelancerAddress String
+  freelancer        User   @relation("FreelancerProposals", fields: [freelancerAddress], references: [walletAddress])
+
+  status String // PENDING_CLIENT, PENDING_FL, ACCEPTED, DECLINED, DELIVERED, COMPLETED, DISPUTED
+
+  // Section A: Economics
+  hashAnchor   String
+  paymentAsset String
+  milestones   Json
+
+  // Section B: Delivery
+  timeLocks          String
+  acceptanceCriteria String
+  revisions          String
+  reporting          String
+
+  // Section C: Security
+  escrowInit     String
+  arbitration    String
+  killSwitch     String
+  ghostingClause String
+  hostageClause  String
+
+  // Section D: Legal
+  ipRights String @default("Full IP transfer upon final payment")
+  nda      String @default("Standard confidentiality applies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

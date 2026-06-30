@@ -120,8 +120,8 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   const { initEscrow, submitMilestone, approveMilestone, requestRevision, dispute, isTxPending } = useEscrowContract();
   
   // Sync tab with URL if available
-  const tabQuery = searchParams?.get("tab") as "board" | "active" | "create" | "proposals" | "discover" | "workrooms" | "dashboard" | "workroom_detail" | null;
-  const [activeTab, setActiveTab] = useState<"board" | "active" | "create" | "proposals" | "discover" | "workrooms" | "dashboard" | "workroom_detail">(tabQuery || "board");
+  const tabQuery = searchParams?.get("tab") as "board" | "active" | "create" | "proposals" | "discover" | "workrooms" | "dashboard" | "workroom_detail" | "past" | null;
+  const [activeTab, setActiveTab] = useState<"board" | "active" | "create" | "proposals" | "discover" | "workrooms" | "dashboard" | "workroom_detail" | "past">(tabQuery || "board");
   
   useEffect(() => {
     if (tabQuery) {
@@ -314,15 +314,32 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
     }
   }, [selectedWorkroom, role, jobs, aiReviews, loadingAiReview]);
 
+  // Fetch proposals from database
+  const fetchProposals = async () => {
+    try {
+      const res = await fetch("/api/proposals");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setSubmittedProposals(data.proposals);
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching proposals:", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchProposals();
+    const interval = setInterval(fetchProposals, 5000); // 5 seconds polling
+    return () => clearInterval(interval);
+  }, []);
+
   // ---- Persistence Effects ----
   useEffect(() => {
     const savedJobs = localStorage.getItem("trustflow_jobs");
     if (savedJobs) {
       try { setJobs(JSON.parse(savedJobs)); } catch(e){}
-    }
-    const savedProposals = localStorage.getItem("trustflow_proposals");
-    if (savedProposals) {
-      try { setSubmittedProposals(JSON.parse(savedProposals)); } catch(e){}
     }
     setIsLoaded(true);
   }, []);
@@ -332,12 +349,6 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       localStorage.setItem("trustflow_jobs", JSON.stringify(jobs));
     }
   }, [jobs, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("trustflow_proposals", JSON.stringify(submittedProposals));
-    }
-  }, [submittedProposals, isLoaded]);
 
   // ---- Handlers ----
 
@@ -472,7 +483,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       nda: "Standard mutual NDA applied via on-chain hash signature."
     };
 
+    // Update locally for instant feedback
     setSubmittedProposals([...submittedProposals, proposal]);
+    
+    // Sync to DB
+    fetch("/api/proposals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(proposal)
+    }).then(() => fetchProposals());
+
     toast.success("Programmatic 14-Point Proposal sent to Client!");
     setSelectedJob(null);
     setMilestones([]);
@@ -514,11 +534,31 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       toast.loading("Preparing transaction and waiting for signature...", { id: "escrow_tx" });
       await initEscrow(prop.jobId, prop.freelancerAddress, amountsXlm, deadlinesMs, revLimit);
       toast.success("Funds locked in Soroban Smart Contract!", { id: "escrow_tx" });
-      setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? { ...p, status: "ACCEPTED" } : p));
+      
+      const updatedProp = { ...prop, status: "ACCEPTED" as const };
+      setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? updatedProp : p));
+      
+      if (prop.id) {
+        fetch(`/api/proposals/${prop.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedProp)
+        }).then(() => fetchProposals());
+      }
+      
     } catch (error: any) {
       if (error.message?.includes("#1")) {
         toast.success("Escrow already funded on network. Syncing UI...", { id: "escrow_tx" });
-        setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? { ...p, status: "ACCEPTED" } : p));
+        const updatedProp = { ...prop, status: "ACCEPTED" as const };
+        setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? updatedProp : p));
+        
+        if (prop.id) {
+          fetch(`/api/proposals/${prop.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedProp)
+          }).then(() => fetchProposals());
+        }
       } else {
         toast.error(`Escrow funding failed: ${error.message || error}`, { id: "escrow_tx" });
       }
@@ -537,7 +577,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
     e.preventDefault();
     if (!counterMode) return;
 
-    // Update the submitted proposal array by replacing the countered one
+    // Update the submitted proposal array locally
     const updatedProposal: ProposalData = {
       ...counterMode,
       paymentAsset: counterMode.paymentAsset || "USDC",
@@ -547,6 +587,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
     };
 
     setSubmittedProposals(submittedProposals.map(p => p.jobId === counterMode.jobId ? updatedProposal : p));
+    
+    // Sync to DB
+    if (counterMode.id) {
+      fetch(`/api/proposals/${counterMode.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProposal)
+      }).then(() => fetchProposals());
+    }
+
     toast.success(role === "client" ? "Counter Offer Sent! Waiting for Freelancer to sign." : "Counter Offer Sent! Waiting for Client to sign.");
     setCounterMode(null);
   };
@@ -568,7 +618,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       });
       setSubmittedProposals(updatedProposals);
       const updatedWorkroom = updatedProposals.find(p => p.jobId === selectedWorkroom.jobId);
-      if (updatedWorkroom) setSelectedWorkroom(updatedWorkroom);
+      if (updatedWorkroom) {
+        setSelectedWorkroom(updatedWorkroom);
+        if (updatedWorkroom.id) {
+          fetch(`/api/proposals/${updatedWorkroom.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedWorkroom)
+          }).then(() => fetchProposals());
+        }
+      }
       toast.success("Milestone submitted to smart contract!");
     } catch (e: any) {
       if (e.message?.includes("#5")) {
@@ -583,7 +642,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
         });
         setSubmittedProposals(updatedProposals);
         const updatedWorkroom = updatedProposals.find(p => p.jobId === selectedWorkroom.jobId);
-        if (updatedWorkroom) setSelectedWorkroom(updatedWorkroom);
+        if (updatedWorkroom) {
+          setSelectedWorkroom(updatedWorkroom);
+          if (updatedWorkroom.id) {
+            fetch(`/api/proposals/${updatedWorkroom.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedWorkroom)
+            }).then(() => fetchProposals());
+          }
+        }
       } else {
         toast.error(e.message);
       }
@@ -604,7 +672,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       });
       setSubmittedProposals(updatedProposals);
       const updatedWorkroom = updatedProposals.find(p => p.jobId === selectedWorkroom.jobId);
-      if (updatedWorkroom) setSelectedWorkroom(updatedWorkroom);
+      if (updatedWorkroom) {
+        setSelectedWorkroom(updatedWorkroom);
+        if (updatedWorkroom.id) {
+          fetch(`/api/proposals/${updatedWorkroom.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedWorkroom)
+          }).then(() => fetchProposals());
+        }
+      }
       toast.success("Milestone approved and funds released!");
     } catch (e: any) {
       if (e.message?.includes("#5")) {
@@ -619,7 +696,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
         });
         setSubmittedProposals(updatedProposals);
         const updatedWorkroom = updatedProposals.find(p => p.jobId === selectedWorkroom.jobId);
-        if (updatedWorkroom) setSelectedWorkroom(updatedWorkroom);
+        if (updatedWorkroom) {
+          setSelectedWorkroom(updatedWorkroom);
+          if (updatedWorkroom.id) {
+            fetch(`/api/proposals/${updatedWorkroom.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedWorkroom)
+            }).then(() => fetchProposals());
+          }
+        }
       } else {
         toast.error(e.message);
       }
@@ -639,7 +725,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       });
       setSubmittedProposals(updatedProposals);
       const updatedWorkroom = updatedProposals.find(p => p.jobId === selectedWorkroom.jobId);
-      if (updatedWorkroom) setSelectedWorkroom(updatedWorkroom);
+      if (updatedWorkroom) {
+        setSelectedWorkroom(updatedWorkroom);
+        if (updatedWorkroom.id) {
+          fetch(`/api/proposals/${updatedWorkroom.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedWorkroom)
+          }).then(() => fetchProposals());
+        }
+      }
       toast.success("Revision requested on-chain!");
     } catch (e: any) {
       toast.error(e.message);
@@ -655,7 +750,19 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
         p.jobId === selectedWorkroom.jobId ? { ...p, status: "DISPUTED" as const } : p
       );
       setSubmittedProposals(updatedProposals);
-      setSelectedWorkroom({ ...selectedWorkroom, status: "DISPUTED" });
+      const updatedWorkroom = updatedProposals.find(p => p.jobId === selectedWorkroom.jobId);
+      
+      if (updatedWorkroom) {
+        setSelectedWorkroom(updatedWorkroom);
+        if (updatedWorkroom.id) {
+          fetch(`/api/proposals/${updatedWorkroom.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedWorkroom)
+          }).then(() => fetchProposals());
+        }
+      }
+      
       toast.error("Dispute initiated on-chain!");
     } catch (e: any) {
       toast.error(e.message);
@@ -706,6 +813,9 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                 </button>
                 <button onClick={() => {setActiveTab("workrooms"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "workrooms" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                   Workrooms <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length}</span>
+                </button>
+                <button onClick={() => {setActiveTab("past"); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "past" ? "border-green-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+                  Past Jobs <span className="bg-zinc-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).length}</span>
                 </button>
               </div>
             )}
@@ -970,6 +1080,38 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                 )}
               </div>
             )}
+
+            {/* View: Past Jobs (Both FL & Client) */}
+            {activeTab === "past" && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                {submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).length === 0 ? (
+                  <div className="text-center py-20 bg-zinc-900/20 rounded-3xl border border-dashed border-white/10">
+                    <h3 className="text-xl font-bold text-zinc-400">No past jobs</h3>
+                    <p className="text-zinc-500 mt-2">Finished or disputed contracts will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-6">
+                    {submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).map((prop, i) => (
+                      <div key={i} className={`bg-zinc-900/50 border p-5 rounded-2xl ${prop.status === "DISPUTED" ? "border-red-500/30 hover:border-red-500/50" : "border-emerald-500/30 hover:border-emerald-500/50"} transition-colors`}>
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full ${prop.status === "DISPUTED" ? "bg-red-500" : "bg-emerald-500"}`}></span>
+                              Job ID: {prop.jobId}
+                            </h4>
+                            <p className="text-sm text-zinc-400 mt-1">Freelancer: {prop.freelancerAddress}</p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${prop.status === "DISPUTED" ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"}`}>
+                            {prop.status}
+                          </span>
+                        </div>
+                        <ContractTemplate data={prop} viewMode={role} onAction={() => {}} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
           </motion.div>
         )}
 
@@ -991,7 +1133,10 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                     Pending Proposals <span className="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => p.status.startsWith("PENDING")).length}</span>
                   </button>
                   <button onClick={() => {setActiveTab("workrooms"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "workrooms" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
-                    Active Escrows <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length}</span>
+                    Workrooms <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["ACCEPTED", "DELIVERED"].includes(p.status)).length}</span>
+                  </button>
+                  <button onClick={() => {setActiveTab("past"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "past" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+                    Past Jobs <span className="bg-zinc-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{submittedProposals.filter(p => ["COMPLETED", "DISPUTED"].includes(p.status)).length}</span>
                   </button>
                   <button onClick={() => {setActiveTab("discover"); setIsEditingJob(null); setCounterMode(null);}} className={`font-semibold pb-2 border-b-2 transition-all text-sm sm:text-base ${activeTab === "discover" ? "border-blue-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                     Discover Talent <span className="text-xs bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-2 py-0.5 rounded-full ml-1 font-bold animate-pulse">NEW</span>
