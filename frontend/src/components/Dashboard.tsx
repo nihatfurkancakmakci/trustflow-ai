@@ -814,9 +814,9 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
 
                   {/* Programmatic Milestones Builder */}
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-white/10 pb-2 gap-3">
                       <Label className="text-zinc-300 text-lg">Programmatic Milestones</Label>
-                      <Button type="button" onClick={handleAddMilestone} variant="outline" className="text-xs py-1 h-8 border-green-500/30 text-green-400 hover:bg-green-500/10">
+                      <Button type="button" onClick={handleAddMilestone} variant="outline" className="w-full sm:w-auto text-xs py-1 h-8 border-green-500/30 text-green-400 hover:bg-green-500/10">
                         + Add Milestone
                       </Button>
                     </div>
@@ -861,12 +861,12 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                     )}
                   </div>
 
-                  <div className="bg-green-950/20 p-4 rounded-xl border border-green-500/20 flex items-center justify-between mt-6">
-                    <div>
+                  <div className="bg-green-950/20 p-4 rounded-xl border border-green-500/20 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between mt-6">
+                    <div className="flex-1">
                       <h4 className="text-green-400 font-bold text-sm">Automated Legal Standard Attached</h4>
                       <p className="text-xs text-zinc-400 mt-1">Gas Fees (Client Pays via Fee-Bump), IP Rights transfer, and Ghosting clauses automatically applied.</p>
                     </div>
-                    <Button type="submit" className="bg-green-600 hover:bg-green-500 text-black font-bold px-8"><FileCode2 className="w-4 h-4 mr-2" /> Sign & Send Proposal</Button>
+                    <Button type="submit" className="w-full sm:w-auto bg-green-600 hover:bg-green-500 text-black font-bold px-8 shrink-0"><FileCode2 className="w-4 h-4 mr-2" /> Sign & Send Proposal</Button>
                   </div>
                 </form>
               </motion.div>

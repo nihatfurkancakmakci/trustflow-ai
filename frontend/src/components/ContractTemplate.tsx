@@ -204,28 +204,30 @@ export function ContractTemplate({
         </div>
 
         {/* Action Button */}
-        <div className="pt-6 border-t border-white/10 flex justify-between items-center sticky bottom-0 bg-zinc-950/90 backdrop-blur-md pb-2">
+        <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row md:justify-between md:items-center gap-4 sticky bottom-0 bg-zinc-950/95 backdrop-blur-md pb-4">
           <div className="text-sm font-mono text-zinc-400 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            Status: {data.status === "PENDING_FL" ? "Waiting for Freelancer Signature" : data.status === "PENDING_CLIENT" ? "Waiting for Client Signature" : data.status === "ACCEPTED" ? "Funds Locked & Contract Active" : "Declined"}
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0"></span>
+            <span>Status: {data.status === "PENDING_FL" ? "Waiting for Freelancer Signature" : data.status === "PENDING_CLIENT" ? "Waiting for Client Signature" : data.status === "ACCEPTED" ? "Funds Locked & Contract Active" : "Declined"}</span>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             {viewMode === "client" && onDecline && (
-              <Button variant="outline" onClick={onDecline} className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500 transition-all">
+              <Button variant="outline" onClick={onDecline} className="w-full sm:w-auto border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500 transition-all py-2.5">
                 Decline
               </Button>
             )}
             {onCounterOffer && (
-              <Button variant="outline" onClick={onCounterOffer} className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-500 transition-all">
+              <Button variant="outline" onClick={onCounterOffer} className="w-full sm:w-auto border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-500 transition-all py-2.5">
                 Counter Offer
               </Button>
             )}
-            <Button 
-              onClick={onAction}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-extrabold px-8 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] betterhover:active:scale-[0.98] transition-all"
-            >
-              {actionText}
-            </Button>
+            {onAction && (
+              <Button 
+                onClick={onAction}
+                className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-extrabold px-8 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] betterhover:active:scale-[0.98] transition-all py-2.5"
+              >
+                {actionText}
+              </Button>
+            )}
           </div>
         </div>
 
