@@ -3,14 +3,31 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: any }) {
   try {
-    const id = params.id;
+    // Await params for Next.js 14+ compatibility
+    const resolvedParams = await context.params;
+    const idOrJobId = resolvedParams.id;
     const data = await request.json();
+    
+    // Check if the idOrJobId is a CUID (Prisma default is 25 chars, starts with 'c')
+    // If not, we assume it's a jobId and we need to find the proposal first
+    let dbId = idOrJobId;
+    if (!idOrJobId.startsWith('c') && idOrJobId.length !== 25) {
+      const existing = await prisma.proposal.findFirst({
+        where: { jobId: idOrJobId },
+        orderBy: { createdAt: "desc" }
+      });
+      if (existing) {
+        dbId = existing.id;
+      } else {
+        return NextResponse.json({ success: false, error: "Proposal not found" }, { status: 404 });
+      }
+    }
     
     // We only update the fields that can change during negotiation/escrow
     const updatedProposal = await prisma.proposal.update({
-      where: { id },
+      where: { id: dbId },
       data: {
         status: data.status,
         paymentAsset: data.paymentAsset,

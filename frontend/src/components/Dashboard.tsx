@@ -538,13 +538,11 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       const updatedProp = { ...prop, status: "ACCEPTED" as const };
       setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? updatedProp : p));
       
-      if (prop.id) {
-        fetch(`/api/proposals/${prop.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedProp)
-        }).then(() => fetchProposals());
-      }
+      fetch(`/api/proposals/${prop.id || prop.jobId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProp)
+      }).then(() => fetchProposals());
       
     } catch (error: any) {
       if (error.message?.includes("#1")) {
@@ -552,13 +550,11 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
         const updatedProp = { ...prop, status: "ACCEPTED" as const };
         setSubmittedProposals(submittedProposals.map(p => p.jobId === prop.jobId ? updatedProp : p));
         
-        if (prop.id) {
-          fetch(`/api/proposals/${prop.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedProp)
-          }).then(() => fetchProposals());
-        }
+        fetch(`/api/proposals/${prop.id || prop.jobId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedProp)
+        }).then(() => fetchProposals());
       } else {
         toast.error(`Escrow funding failed: ${error.message || error}`, { id: "escrow_tx" });
       }
@@ -598,13 +594,15 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
     setSubmittedProposals(submittedProposals.map(p => p.jobId === counterMode.jobId ? updatedProposal : p));
     
     // Sync to DB
-    if (counterMode.id) {
-      fetch(`/api/proposals/${counterMode.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedProposal)
-      }).then(() => fetchProposals());
-    }
+    fetch(`/api/proposals/${counterMode.id || counterMode.jobId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedProposal)
+    }).then(async r => {
+      const data = await r.json();
+      if (!data.success) toast.error("Counter offer sync failed: " + data.error);
+      else fetchProposals();
+    }).catch(e => toast.error("Sync error: " + e.message));
 
     toast.success(role === "client" ? "Counter Offer Sent! Waiting for Freelancer to sign." : "Counter Offer Sent! Waiting for Client to sign.");
     setCounterMode(null);
@@ -1842,16 +1840,16 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                             };
                                             const deliveryNotes = m.commits?.map(c => c.message).join("\n\n") || "No delivery logs provided.";
                                             setLoadingAiReview(prev => ({ ...prev, [cacheKey]: true }));
-                                            fetch("/api/ai-review", {
-                                              method: "POST",
+                                            
+                                            const prop = submittedProposals.find(p => p.jobId === selectedWorkroom.jobId);
+                                            const updatedProp = {
+                                              ...prop,
+                                              milestones: prop?.milestones.map(mile => mile.id === m.id ? { ...mile, commits: m.commits } : mile)
+                                            };
+
+                                            fetch(`/api/proposals/${prop?.id || prop?.jobId}`, {
+                                              method: "PUT",
                                               headers: { "Content-Type": "application/json" },
-                                              body: JSON.stringify({
-                                                jobTitle: jobDetail.title,
-                                                jobDescription: jobDetail.scope,
-                                                milestoneDescription: m.name,
-                                                deliveryNotes: deliveryNotes
-                                              })
-                                            })
                                               .then(r => r.json())
                                               .then(data => {
                                                 if (data.success && data.review) {
