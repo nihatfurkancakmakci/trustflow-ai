@@ -770,7 +770,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
         }
       }
       
-      toast.error("Dispute initiated on-chain!");
+      toast.success("Dispute initiated on-chain!");
     } catch (e: any) {
       toast.error(e.message);
     }
