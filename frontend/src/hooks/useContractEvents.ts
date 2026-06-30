@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { rpc } from '@stellar/stellar-sdk';
+import { rpc, scValToNative } from '@stellar/stellar-sdk';
 import { toast } from 'sonner';
 
 const SERVER_URL = "https://soroban-testnet.stellar.org";
@@ -32,7 +32,7 @@ export function useContractEvents() {
         if (eventsResp.events && eventsResp.events.length > 0) {
           eventsResp.events.forEach(event => {
             if (event.type === 'contract' && event.topic) {
-              const topicVal = event.topic[0]?.toCV()?.value();
+              const topicVal = event.topic[0] ? scValToNative(event.topic[0]) : null;
               const eventType = topicVal ? topicVal.toString() : "Unknown Event";
               
               if (eventType === "init") {

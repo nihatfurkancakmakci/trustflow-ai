@@ -1,5 +1,6 @@
-﻿"use client";
+"use client";
 
+import { useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,13 +10,18 @@ import { Wallet, Zap, ShieldCheck } from "lucide-react";
 import { useTestContract } from "@/hooks/useTestContract";
 
 export function WalletConnect() {
-  const { address, isConnecting, connect, disconnect } = useWallet();
+  const { address, connect, disconnect } = useWallet();
   const { testContract, isTesting } = useTestContract();
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const handleLogin = async () => {
+    setIsConnecting(true);
     try {
       const result = await connect();
-      if (!result.address) return;
+      if (!result.address) {
+        setIsConnecting(false);
+        return;
+      }
       toast.success("Wallet connected successfully!");
     } catch (e: any) {
       if (e.message?.includes("rejected") || e.message?.includes("User declined")) {
@@ -25,6 +31,8 @@ export function WalletConnect() {
       } else {
         toast.error("Failed to connect wallet.");
       }
+    } finally {
+      setIsConnecting(false);
     }
   };
 

@@ -35,7 +35,7 @@ export function useTestContract() {
         new StellarSdk.Address(address).toScVal(), // freelancer
         new StellarSdk.Address("CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC").toScVal(), // token (Testnet XLM)
         StellarSdk.xdr.ScVal.scvVec([
-          StellarSdk.nativeToScVal(10000000n, { type: "i128" })
+          StellarSdk.nativeToScVal(BigInt(10000000), { type: "i128" })
         ]), // amounts (1 XLM)
         StellarSdk.xdr.ScVal.scvVec([
           StellarSdk.nativeToScVal(BigInt(Math.floor(Date.now() / 1000) + 86400), { type: "u64" })
@@ -58,7 +58,7 @@ export function useTestContract() {
       const sendResponse = await stellarRpc.sendTransaction(signedTx);
       
       if (sendResponse.status === "ERROR") {
-        throw new Error(sendResponse.errorResultXdr || "Submission failed");
+        throw new Error((sendResponse as any).errorResultXdr || "Submission failed");
       }
       
       toast.loading("Waiting for network confirmation...", { id: loadingToastId });
