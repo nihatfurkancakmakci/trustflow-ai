@@ -457,7 +457,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
       freelancerAddress: pubKey || "UNKNOWN_ADDRESS",
       status: "PENDING_CLIENT",
       hashAnchor: "sha256:8f434346648f6b96df89dda901c5176b...",
-      paymentAsset: `${bidAmount} ${selectedJob.paymentAsset}`,
+      paymentAsset: selectedJob.paymentAsset || "USDC",
       milestones: finalMilestones,
       timeLocks: `${deliveryAmount} ${deliveryUnit} (Absolute UTC Timestamp)`,
       acceptanceCriteria: "Delivery logged on-chain. Client has 72h Grace Period to review.",
@@ -498,7 +498,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
 
   const handleFundEscrow = async (prop: ProposalData) => {
     try {
-      const amountXlm = Number((prop.paymentAsset || "USDC").split(" ")[0]);
+      const amountXlm = prop.milestones.reduce((sum, m) => sum + m.amount, 0);
       
       const amountsXlm = prop.milestones.length > 0 ? prop.milestones.map(m => m.amount) : [amountXlm];
       // Basic mock deadline (14 days from now)
@@ -527,7 +527,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
 
   const initCounterOffer = (prop: ProposalData) => {
     setCounterMode(prop);
-    setCounterBidAmount((prop.paymentAsset || "USDC").split(" ")[0]);
+    setCounterBidAmount(String(prop.milestones.reduce((sum, m) => sum + m.amount, 0)));
     setCounterRevisions(prop.revisions);
     setCounterDeliveryAmount((prop.timeLocks || "14 Days").split(" ")[0]);
     setCounterDeliveryUnit((prop.timeLocks || "14 Days").split(" ")[1]);
@@ -540,7 +540,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
     // Update the submitted proposal array by replacing the countered one
     const updatedProposal: ProposalData = {
       ...counterMode,
-      paymentAsset: `${counterBidAmount} ${(counterMode.paymentAsset || "USDC").split(" ").slice(1).join(" ")}`,
+      paymentAsset: counterMode.paymentAsset || "USDC",
       timeLocks: `${counterDeliveryAmount} ${counterDeliveryUnit} (Absolute UTC Timestamp)`,
       revisions: counterRevisions,
       status: role === "client" ? "PENDING_FL" : "PENDING_CLIENT"
