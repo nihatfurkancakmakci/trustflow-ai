@@ -69,20 +69,20 @@ export function ContractTemplate({
       <div className="relative z-10 bg-zinc-950/95 backdrop-blur-2xl rounded-[14px] p-6 text-zinc-300 space-y-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
         
         {/* Header */}
-        <div className="border-b border-white/10 pb-4 flex justify-between items-start">
+        <div className="border-b border-white/10 pb-4 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
           <div>
             <h2 className="text-xl font-black text-white flex items-center gap-2">
-              <Fingerprint className="w-5 h-5 text-green-500"/>
-              Enterprise Smart Contract Proposal
+              <Fingerprint className="w-5 h-5 text-green-500 shrink-0"/>
+              <span className="break-words">Enterprise Smart Contract Proposal</span>
             </h2>
-            <p className="text-sm font-mono text-green-500 mt-2 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" /> Provider: {data.freelancerAddress.substring(0, 6)}...{data.freelancerAddress.substring(data.freelancerAddress.length - 4)}
+            <p className="text-sm font-mono text-green-500 mt-2 flex items-center gap-2 break-all">
+              <ShieldCheck className="w-4 h-4 shrink-0" /> Provider: {data.freelancerAddress.substring(0, 6)}...{data.freelancerAddress.substring(data.freelancerAddress.length - 4)}
             </p>
           </div>
-          <div className="text-right p-3 rounded-xl bg-green-950/30 border border-green-500/20">
+          <div className="text-left md:text-right p-3 rounded-xl bg-green-950/30 border border-green-500/20 w-full md:w-auto shrink-0">
             <span className="block text-xs font-bold text-green-500 uppercase">Total Locked Value</span>
-            <span className="font-black text-2xl text-white flex items-center justify-end gap-1 mt-1">
-              <DollarSign className="w-5 h-5 text-green-500"/>
+            <span className="font-black text-2xl text-white flex items-center justify-start md:justify-end gap-1 mt-1">
+              <DollarSign className="w-5 h-5 text-green-500 shrink-0"/>
               {data.paymentAsset}
             </span>
           </div>

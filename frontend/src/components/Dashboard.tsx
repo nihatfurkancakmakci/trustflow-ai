@@ -1421,7 +1421,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
             <Button variant="ghost" onClick={() => { setActiveTab("workrooms"); setSelectedWorkroom(null); }} className="text-zinc-400 hover:text-white mb-2">← Back to Active Escrows</Button>
             
-            <div className="bg-zinc-900/60 border border-white/10 p-8 rounded-3xl relative overflow-hidden">
+            <div className="bg-zinc-900/60 border border-white/10 p-4 sm:p-8 rounded-3xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500"></div>
               <h2 className="text-3xl font-bold text-white mb-2">Secure Workroom</h2>
               <p className="text-zinc-400 mb-8">Job ID: {selectedWorkroom.jobId}</p>
@@ -1462,10 +1462,10 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                 </div>
 
                 {/* Actions */}
-                <div className="bg-black/50 rounded-2xl p-6 border border-white/5 flex flex-col justify-center space-y-6">
+                <div className="bg-black/50 rounded-2xl p-4 sm:p-6 border border-white/5 flex flex-col justify-center space-y-6">
 
                   {/* Milestones & Commits (Timeline) */}
-                  <div className="bg-black/50 rounded-2xl p-6 border border-white/5">
+                  <div className="bg-black/50 rounded-2xl p-4 sm:p-6 border border-white/5">
                     <h3 className="text-xl font-bold text-white mb-6">Milestones & Commits</h3>
                     <div className="space-y-8">
                       {selectedWorkroom.milestones.map((m, i) => {
@@ -1476,12 +1476,12 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                         return (
                         <div key={i} className={`relative pl-6 border-l-2 ${isActive ? 'border-blue-500' : 'border-white/10'} pb-4 transition-all ${!isPreviousApproved && 'opacity-50 grayscale'}`}>
                           <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-4 border-black ${mStatus === 'APPROVED' ? 'bg-green-500' : isActive ? 'bg-blue-500' : 'bg-zinc-700'}`}></div>
-                          <div className="flex justify-between items-start mb-2">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
                             <div>
                               <h4 className="text-white font-bold text-lg">{m.name}</h4>
                               <p className="text-sm text-zinc-500">{m.percentage}% of total funds ({m.amount} {String(selectedWorkroom.paymentAsset).includes("undefined") ? "USDC" : (selectedWorkroom.paymentAsset || "").split(" ")[1] || "USDC"})</p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-right shrink-0">
                               <span className={`text-xs font-bold px-2 py-1 rounded-full ${mStatus === 'APPROVED' ? 'bg-green-500/20 text-green-400' : mStatus === 'SUBMITTED' ? 'bg-amber-500/20 text-amber-400' : mStatus === 'REVISION_REQUESTED' ? 'bg-red-500/20 text-red-400' : 'bg-zinc-800 text-zinc-400'}`}>
                                 {mStatus}
                               </span>
@@ -1497,7 +1497,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                     <GitCommit className="w-4 h-4 text-zinc-500" />
                                   </div>
                                   <div>
-                                    <p className="text-white text-sm whitespace-pre-wrap">{commit.message}</p>
+                                    <p className="text-white text-sm whitespace-pre-wrap break-all">{commit.message}</p>
                                     <p className="text-xs text-zinc-500 mt-1">{commit.date}</p>
                                   </div>
                                 </div>
@@ -1599,12 +1599,12 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                         animate={{ opacity: 1, y: 0 }}
                                         className="bg-zinc-900/60 border border-indigo-500/30 p-5 rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.1)] space-y-4"
                                       >
-                                        <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pb-3 border-b border-white/5 gap-2">
                                           <div className="flex items-center gap-2">
-                                            <Brain className="w-5 h-5 text-indigo-400" />
+                                            <Brain className="w-5 h-5 text-indigo-400 shrink-0" />
                                             <h4 className="text-white font-bold text-sm">TrustFlow AI Audit</h4>
                                           </div>
-                                          <div className="flex items-center gap-2">
+                                          <div className="flex flex-wrap items-center gap-2">
                                             <span className="text-[10px] text-zinc-500 font-mono">Conf: {review.aiConfidence}%</span>
                                             <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                                               review.score >= 80 ? "bg-green-500/10 text-green-400 border border-green-500/20" :
@@ -1627,7 +1627,7 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                               {review.recommendation}
                                             </span>
                                           </div>
-                                          <p className="text-xs text-zinc-300 leading-relaxed bg-black/30 p-3 rounded-xl border border-white/5">
+                                          <p className="text-xs text-zinc-300 leading-relaxed bg-black/30 p-3 rounded-xl border border-white/5 break-words">
                                             {review.summary}
                                           </p>
                                         </div>
