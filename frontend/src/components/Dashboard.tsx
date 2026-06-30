@@ -1841,16 +1841,17 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                             const deliveryNotes = m.commits?.map(c => c.message).join("\n\n") || "No delivery logs provided.";
                                             setLoadingAiReview(prev => ({ ...prev, [cacheKey]: true }));
                                             
-                                            const prop = submittedProposals.find(p => p.jobId === selectedWorkroom.jobId);
-                                            const updatedProp = {
-                                              ...prop,
-                                              milestones: prop?.milestones.map(mile => mile.id === m.id ? { ...mile, commits: m.commits } : mile)
-                                            };
-
-                                            fetch(`/api/proposals/${prop?.id || prop?.jobId}`, {
-                                              method: "PUT",
+                                            fetch("/api/ai-review", {
+                                              method: "POST",
                                               headers: { "Content-Type": "application/json" },
-                                              .then(r => r.json())
+                                              body: JSON.stringify({
+                                                jobTitle: jobDetail.title,
+                                                jobDescription: jobDetail.scope,
+                                                milestoneDescription: m.name,
+                                                deliveryNotes: deliveryNotes
+                                              })
+                                            })
+                                            .then(r => r.json())
                                               .then(data => {
                                                 if (data.success && data.review) {
                                                   setAiReviews(prev => ({ ...prev, [cacheKey]: data.review }));
