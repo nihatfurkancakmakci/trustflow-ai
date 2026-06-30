@@ -67,10 +67,10 @@ We believe Web3 shouldn't be clunky. Here is the seamless user experience we've 
 </details>
 
 <details open>
-<summary><b>4. Freelancer Rating & Reviews</b></summary>
+<summary><b>4. User Profile & Public Reputation</b></summary>
 <br/>
 <p align="center">
-  <img src="./public/screenshots/profile.png" width="800" alt="Profile and Reviews" />
+  <img src="./public/screenshots/profile.png" width="800" alt="User Profile" />
 </p>
 </details>
 

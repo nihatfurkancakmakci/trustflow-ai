@@ -62,9 +62,9 @@ Once funded by the client, the contract is locked on-chain. Freelancers log comm
 Our 4-tier hybrid AI engine analyzes code changes via GitHub API, checks requirements, and scores the quality.
 ![AI Audit Raporu](frontend/public/screenshots/AI_Audit_Report.png)
  
-### 4. Freelancer Rating & Reviews
-Clients star-rate and comment upon job completion, updating the freelancer's public page.
-![Profile and Reviews](frontend/public/screenshots/profile.png)
+### 4. User Profile & Public Reputation
+Users manage their professional profiles (Client or Freelancer), viewing ratings, email, bio, and completed contract history.
+![User Profile](frontend/public/screenshots/profile.png)
  
 ### 5. Automated CI/CD Testing & Pipeline
 Automated pipeline verifying both smart contracts and frontend builds on every commit.
