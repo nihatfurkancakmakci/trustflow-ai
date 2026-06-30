@@ -223,11 +223,11 @@ export function ContractTemplate({
                         </div>
                         <div>
                           <span className="text-[10px] font-black text-red-500/70 block mb-1 uppercase tracking-wider">Arbitration Designation</span>
-                          <p className="text-xs text-red-100 font-mono bg-red-950/40 p-2 rounded border border-red-500/10">{data.arbitration}</p>
+                          <p className="text-xs text-red-100 font-mono bg-red-950/40 p-2 rounded border border-red-500/10">{data.arbitration?.replace("null", "Decentralized Arbitrator")}</p>
                         </div>
                         <div className="col-span-2">
                           <span className="text-[10px] font-black text-red-500/70 block mb-1 flex items-center gap-1 uppercase tracking-wider"><XOctagon className="w-3 h-3"/> Late Penalty (Slashing)</span>
-                          <p className="text-xs text-red-100 font-mono bg-red-950/40 p-2 rounded border border-red-500/10">{data.killSwitch}</p>
+                          <p className="text-xs text-red-100 font-mono bg-red-950/40 p-2 rounded border border-red-500/10">{data.killSwitch?.replace("null", "Strict Policy")}</p>
                         </div>
                       </div>
 
