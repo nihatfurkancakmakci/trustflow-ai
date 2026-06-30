@@ -1617,9 +1617,9 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
                                         </div>
 
                                         <div className="space-y-2">
-                                          <div className="flex items-center gap-2">
+                                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                             <span className="text-xs text-zinc-500 uppercase tracking-wider font-bold">Recommendation:</span>
-                                            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                                            <span className={`text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full ${
                                               review.recommendation === "APPROVE" ? "bg-green-500/20 text-green-400 border border-green-500/30" :
                                               review.recommendation === "REVISION_NEEDED" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
                                               "bg-red-500/20 text-red-400 border border-red-500/30"
