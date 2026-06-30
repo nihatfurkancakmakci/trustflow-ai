@@ -1,31 +1,40 @@
 <div align="center">
   <h1>🌟 TrustFlow AI</h1>
-  <p><strong>Secure. Fast. Decentralized. The Next-Gen Freelance & Project Operating System powered by Stellar.</strong></p>
+  <p><strong>Secure. Fast. Decentralized. The Next-Gen Freelance & Project Operating System powered by Stellar & Soroban.</strong></p>
 
   <div>
     <img src="https://img.shields.io/badge/Stellar-Testnet-blue?style=for-the-badge&logo=stellar" alt="Stellar" />
-    <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/Soroban-Smart_Contracts-orange?style=for-the-badge&logo=rust" alt="Soroban" />
+    <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" alt="Next.js" />
     <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
     <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer" alt="Framer Motion" />
   </div>
 </div>
 
 <br />
 
-> **🏆 Submission for the Stellar Journey to Mastery Program**
-> This repository represents the evolution of TrustFlow AI, from a Level 1 (White Belt) foundation to a fully overhauled, premium Web3 ecosystem ready for Level 2 (Soroban Smart Contracts).
+> **🏆 Submission for the Stellar Journey to Mastery Program (Level 3 - Orange Belt)**
+> This sub-directory contains the Next.js 16 front-end application and the AI-auditing serverless routes for the TrustFlow AI ecosystem.
 
 ---
 
-## 🌌 The Vision
-TrustFlow AI bridges the gap between freelancers, clients, and decentralized finance. By leveraging the unmatched speed and low fees of the **Stellar Network**, we provide a trustless, automated, and frictionless payment infrastructure wrapped in a world-class UI.
+## ✨ Key Features (Level 3 - Orange Belt)
 
-## ✨ Key Features (Level 1 Mastery)
-- 🎨 **Premium UI/UX**: An immersive "Deep Space" dark mode featuring glassmorphism, fluid `framer-motion` animations, and neon emerald accents.
-- 🔐 **Seamless Wallet Integration**: One-click connect via the `@stellar/freighter-api`. 
-- 📊 **Real-Time Testnet Data**: Live fetching of XLM balances directly from the Stellar Horizon nodes.
-- ⚡ **Frictionless Transactions**: Peer-to-peer XLM transfers tested and verified, complete with instant transaction hashing and Stellar Expert explorer links.
+- 🔐 **Stellar & Soroban Escrow**: Milestone funds are locked securely in Soroban on-chain smart accounts and released step-by-step.
+- ⚖️ **Soroban Arbitration & Dispute Oracle**: Programmable hooks to handle disputes via platforms, split balances, or oracle decisions.
+- 🧠 **4-Tier Hybrid AI Delivery Auditor**: A fallback chain that runs dynamically when milestones are submitted to check code quality.
+- 🐙 **GitHub Metadata Parser**: Submitting a GitHub URL dynamically extracts code additions, deletions, commit logs, and file changes.
+- ⭐️ **Interactive Feedback & Reviews**: Star rating (1-5) and text feedback modal displayed in the workroom upon contract completion.
+- 📱 **Mobile Responsive Design**: Fluid mobile layout optimized for all device sizes.
+
+---
+
+## 📜 Deployed Smart Contracts
+
+* **Escrow Contract (Stellar Testnet)**:
+  `CAYJUZTTDE3IOSJAH6TA4ZJ4QSAXBT2MKV3RGVOFZCVLE43WYP2ZXFD6`
+* **Arbitration Oracle Hook**:
+  `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` (Dynamic Stellar Testnet anchor address)
 
 ---
 
@@ -34,34 +43,50 @@ TrustFlow AI bridges the gap between freelancers, clients, and decentralized fin
 We believe Web3 shouldn't be clunky. Here is the seamless user experience we've crafted:
 
 <details open>
-<summary><b>1. The Immersive Connect Screen</b></summary>
+<summary><b>1. Job Post Board & Creation</b></summary>
 <br/>
 <p align="center">
-  <img src="./public/screenshots/start.png" width="800" alt="Start Screen" />
+  <img src="./public/screenshots/Post_Job_Screen.png" width="800" alt="Job Posting Board" />
 </p>
 </details>
 
 <details open>
-<summary><b>2. Connected Dashboard & Live Balance</b></summary>
+<summary><b>2. Secure Workroom & Milestones</b></summary>
 <br/>
 <p align="center">
-  <img src="./public/screenshots/wallet-connected.png" width="800" alt="Wallet Connected" />
+  <img src="./public/screenshots/workroom.png" width="800" alt="Secure Workroom" />
 </p>
 </details>
 
 <details open>
-<summary><b>3. Secure Freighter Approval</b></summary>
+<summary><b>3. Live AI Delivery Audit & Code Review</b></summary>
 <br/>
 <p align="center">
-  <img src="./public/screenshots/trustflow-ui.png" width="800" alt="Wallet Approval" />
+  <img src="./public/screenshots/AI_Audit_Report.png" width="800" alt="AI Audit Raporu" />
 </p>
 </details>
 
 <details open>
-<summary><b>4. Instant Transaction Verification</b></summary>
+<summary><b>4. Freelancer Rating & Reviews</b></summary>
 <br/>
 <p align="center">
-  <img src="./public/screenshots/tx-success.png" width="800" alt="Transaction Success" />
+  <img src="./public/screenshots/profile.png" width="800" alt="Profile and Reviews" />
+</p>
+</details>
+
+<details open>
+<summary><b>5. Automated CI/CD Testing & Pipeline</b></summary>
+<br/>
+<p align="center">
+  <img src="./public/screenshots/CI_CD.png" width="800" alt="CI/CD Pipeline" />
+</p>
+</details>
+
+<details open>
+<summary><b>6. Passing Test Suites</b></summary>
+<br/>
+<p align="center">
+  <img src="./public/screenshots/test_ekran%C4%B1.png" width="800" alt="Test Suites" />
 </p>
 </details>
 
@@ -77,34 +102,25 @@ Experience the premium UI and Stellar integration locally in just a few steps:
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/nihatfurkancakmakci/trustflow-ai.git
-   cd trustflow-ai/frontend
-   ```
-
-2. **Install dependencies**
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Ignite the server**
+2. **Database Migration**
+   Setup your `.env` with your PostgreSQL database URL, then run:
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
+
+3. **Run the server**
    ```bash
    npm run dev
    ```
-
-4. **Explore**
    Open [http://localhost:3000](http://localhost:3000) and step into the future of decentralized work.
 
 ---
-
-## 🗺️ Roadmap: What's Next? (Level 2 & Beyond)
-With the Level 1 integration and UI overhaul fully completed, we are now architecting **Soroban Smart Contracts** to handle:
-- Escrow systems for milestone-based payments.
-- Trustless dispute resolution.
-- Tokenized reputation scores for freelancers.
-
-<br />
 
 <div align="center">
   <p>Built with 💚 for the Stellar Ecosystem.</p>

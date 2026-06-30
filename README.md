@@ -49,15 +49,30 @@ TrustFlow AI bridges the gap between freelancers, clients, and decentralized fin
 ---
 
 ## 📸 Interactive Showcase
+ 
+### 1. Job Post Board & Creation
+Clients specify milestones, payout asset, late penalties, and dispute resolution oracles to launch the job on the public board.
+![Job Posting Board](frontend/public/screenshots/Post_Job_Screen.png)
+ 
+### 2. Secure Workroom & Milestones
+Once funded by the client, the contract is locked on-chain. Freelancers log commits and submit deliveries.
+![Secure Workroom](frontend/public/screenshots/workroom.png)
+ 
+### 3. Live AI Delivery Audit & Code Review
+Our 4-tier hybrid AI engine analyzes code changes via GitHub API, checks requirements, and scores the quality.
+![AI Audit Raporu](frontend/public/screenshots/AI_Audit_Report.png)
+ 
+### 4. Freelancer Rating & Reviews
+Clients star-rate and comment upon job completion, updating the freelancer's public page.
+![Profile and Reviews](frontend/public/screenshots/profile.png)
+ 
+### 5. Automated CI/CD Testing & Pipeline
+Automated pipeline verifying both smart contracts and frontend builds on every commit.
+![CI/CD Pipeline](frontend/public/screenshots/CI_CD.png)
 
-### 1. Secure Workroom & Milestones
-Funds are locked in the Soroban escrow. Freelancers submit milestones by providing commit notes and public GitHub repository links.
-
-### 2. Live AI Delivery Audit
-The hybrid AI engine inspects the GitHub metadata, generates an AI Score (0-100), summarizes strengths/concerns, and gives actionable recommendations.
-
-### 3. Freelancer Rating & Reviews
-Once all milestones are approved, the client is prompted with a star rating and comment form to submit reviews directly to the freelancer's public page.
+### 6. Passing Test Suites
+Verification of Rust smart contracts and Vitest suites running successfully.
+![Test Suites](frontend/public/screenshots/test_ekran%C4%B1.png)
 
 ---
 
