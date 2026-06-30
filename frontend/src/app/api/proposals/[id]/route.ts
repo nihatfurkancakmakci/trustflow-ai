@@ -5,23 +5,24 @@ const prisma = new PrismaClient();
 
 export async function PUT(request: NextRequest, context: { params: any }) {
   try {
-    // Await params for Next.js 14+ compatibility
-    const resolvedParams = await context.params;
-    const idOrJobId = resolvedParams.id;
     const data = await request.json();
     
-    // Check if the idOrJobId is a CUID (Prisma default is 25 chars, starts with 'c')
-    // If not, we assume it's a jobId and we need to find the proposal first
-    let dbId = idOrJobId;
-    if (!idOrJobId.startsWith('c') && idOrJobId.length !== 25) {
+    // Determine the dbId
+    let dbId = data.id;
+    if (!dbId) {
+      if (!data.jobId) {
+        return NextResponse.json({ success: false, error: "Missing both id and jobId" }, { status: 400 });
+      }
+      
       const existing = await prisma.proposal.findFirst({
-        where: { jobId: idOrJobId },
+        where: { jobId: data.jobId },
         orderBy: { createdAt: "desc" }
       });
+      
       if (existing) {
         dbId = existing.id;
       } else {
-        return NextResponse.json({ success: false, error: "Proposal not found" }, { status: 404 });
+        return NextResponse.json({ success: false, error: "Proposal not found for this jobId" }, { status: 404 });
       }
     }
     
