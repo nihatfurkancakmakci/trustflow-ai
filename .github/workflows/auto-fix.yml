@@ -1,0 +1,115 @@
+name: auto-fix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  repository_dispatch:
+    types: [netlify_build_failed, runtime_error, manual_autofix]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: auto-fix-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect-and-dispatch:
+    runs-on: ubuntu-latest
+    # Sonsuz döngü koruması: agent'ın açtığı PR'larda çalışma
+    if: >
+      !contains(github.event.pull_request.labels.*.name, 'antigravity-autofix') &&
+      !contains(github.event.head_commit.message, '[antigravity-autofix]')
+    permissions:
+      contents: read
+      actions: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+        continue-on-error: true
+
+      - name: Collect errors
+        id: collect
+        run: |
+          mkdir -p .autofix
+          echo "[]" > .autofix/errors.json
+
+          # Build
+          npm run build > .autofix/build.log 2>&1 || echo "build_failed=1" >> $GITHUB_ENV
+
+          # TypeScript
+          npx tsc --noEmit > .autofix/tsc.log 2>&1 || echo "ts_failed=1" >> $GITHUB_ENV
+
+          # ESLint
+          npx eslint . --format json > .autofix/eslint.json 2>/dev/null || echo "lint_failed=1" >> $GITHUB_ENV
+
+          # Tests
+          if grep -q '"test"' package.json; then
+            npm test > .autofix/test.log 2>&1 || echo "test_failed=1" >> $GITHUB_ENV
+          fi
+
+          # Netlify build log (dispatch event ise)
+          if [ "${{ github.event.action }}" = "netlify_build_failed" ]; then
+            echo "netlify_failed=1" >> $GITHUB_ENV
+          fi
+
+          # Runtime error (dispatch event ise)
+          if [ "${{ github.event.action }}" = "runtime_error" ]; then
+            echo "runtime_failed=1" >> $GITHUB_ENV
+            echo '${{ toJson(github.event.client_payload) }}' > .autofix/runtime.json
+          fi
+
+          # Scheduled health check
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            HEALTH_URL="${{ vars.HEALTH_CHECK_URL }}"
+            if [ -n "$HEALTH_URL" ]; then
+              curl -sf "$HEALTH_URL" > .autofix/health.log 2>&1 || echo "health_failed=1" >> $GITHUB_ENV
+            fi
+          fi
+        continue-on-error: true
+
+      - name: Check if any error
+        id: check
+        run: |
+          if [ -n "$build_failed$ts_failed$lint_failed$test_failed$netlify_failed$runtime_failed$health_failed" ]; then
+            echo "has_errors=1" >> $GITHUB_OUTPUT
+          else
+            echo "has_errors=0" >> $GITHUB_OUTPUT
+            echo "Yeşil: hata yok."
+          fi
+
+      - name: Dispatch to Antigravity
+        if: steps.check.outputs.has_errors == '1'
+        working-directory: .
+        env:
+          ANTIGRAVITY_WEBHOOK_URL: ${{ secrets.ANTIGRAVITY_WEBHOOK_URL }}
+          ANTIGRAVITY_WEBHOOK_SECRET: ${{ secrets.ANTIGRAVITY_WEBHOOK_SECRET }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          TRIGGER_EVENT: ${{ github.event_name }}:${{ github.event.action }}
+        run: node scripts/dispatch-to-antigravity.mjs
+
+      - name: Upload autofix artifacts
+        if: steps.check.outputs.has_errors == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: autofix-context-${{ github.run_id }}
+          path: frontend/.autofix/
+          retention-days: 7

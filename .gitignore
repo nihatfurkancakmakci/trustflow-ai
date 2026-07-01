@@ -4,6 +4,9 @@ rustup-init.exe
 scratch/
 .agents/
 
+# Allow autofix kit scripts (override *.py ignore)
+!scripts/antigravity-trigger.py
+
 # Environment variables (contains API keys!)
 .env
 .env.local
@@ -22,3 +25,7 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Auto-fix kit temp files
+.autofix/
+.autofix-cache/
