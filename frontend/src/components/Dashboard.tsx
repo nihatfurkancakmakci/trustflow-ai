@@ -75,20 +75,37 @@ export interface JobData {
 const MOCK_JOBS: JobData[] = [
   {
     id: "JOB-9021",
-    title: "Soroban AMM Smart Contract Development",
+    title: "Build a Cross-Border Remittance Widget on Soroban",
     category: "Smart Contract / Web3",
-    scope: "Develop a constant-product AMM in Rust using soroban-sdk. Needs full test coverage.",
-    budgetRange: "8,000 - 12,000",
+    scope: "Develop a fully compliant, self-hosted cross-border remittance widget using Stellar's SEP-31 and Soroban smart contracts. Must handle strict compliance flows.",
+    budgetRange: "3,000 - 5,000",
     paymentAsset: "USDC (Stellar)",
-    timelineAmount: "30",
-    timelineUnit: "Days",
-    expectedRevisions: REVISIONS_OPTS[1],
-    expertise: "Rust, Soroban, DeFi",
+    timelineAmount: "2",
+    timelineUnit: "Months",
+    expectedRevisions: REVISIONS_OPTS[4],
+    expertise: "Senior (Soroban, React, KYC/AML)",
     escrowType: "Milestone-Based Escrow",
     disputePref: "TrustFlow Platform Oracle",
-    penaltyPref: "Hard Deadline (Auto-Terminate)",
+    penaltyPref: "Fixed Fee Deduction",
     ghostingTimelock: "7 Days",
     hostageTimelock: "14 Days"
+  },
+  {
+    id: "JOB-9022",
+    title: "Frontend Developer for AI Chatbot",
+    category: "Web Development",
+    scope: "Need a talented frontend dev to integrate our internal LLM API into a slick, modern React Native and Next.js interface. Must have experience with real-time streaming.",
+    budgetRange: "1,500 - 3,000",
+    paymentAsset: "XLM (Native)",
+    timelineAmount: "3",
+    timelineUnit: "Weeks",
+    expectedRevisions: REVISIONS_OPTS[2],
+    expertise: "Intermediate (React, Next.js, AI APIs)",
+    escrowType: "Full Escrow (Completion Release)",
+    disputePref: "Multi-Sig Consensus",
+    penaltyPref: "Hard Deadline (Auto-Terminate)",
+    ghostingTimelock: "3 Days",
+    hostageTimelock: "7 Days"
   }
 ];
 
@@ -205,18 +222,24 @@ export function Dashboard({ pubKey, balance, initialRole = "freelancer", isEmbed
   const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
   const [workroomFilter, setWorkroomFilter] = useState<"active" | "completed" | "disputed">("active");
 
-  // Local proposal cache cleanup for outdated test job
+  // Local proposal cache cleanup for outdated test job and bugged 'null' string proposals
   useEffect(() => {
-    const badJobId = "cmqyuqjd90002d5ucxi41kzmu";
     const saved = localStorage.getItem("trustflow_proposals");
     if (saved) {
       try {
         const proposals: ProposalData[] = JSON.parse(saved);
-        const filtered = proposals.filter(p => p.jobId !== badJobId);
+        // Filter out proposals with explicit "null" strings stored due to previous bugs
+        const filtered = proposals.filter(p => {
+            const hasNullArbitration = p.arbitration?.includes("null");
+            const hasNullKillswitch = p.killSwitch?.includes("null");
+            const isBadJob = p.jobId === "cmqyuqjd90002d5ucxi41kzmu";
+            return !hasNullArbitration && !hasNullKillswitch && !isBadJob;
+        });
+        
         if (filtered.length !== proposals.length) {
           localStorage.setItem("trustflow_proposals", JSON.stringify(filtered));
           setSubmittedProposals(filtered);
-          if (selectedWorkroom?.jobId === badJobId) {
+          if (selectedWorkroom && !filtered.some(f => f.jobId === selectedWorkroom.jobId)) {
             setSelectedWorkroom(null);
             setActiveTab("workrooms");
           }
